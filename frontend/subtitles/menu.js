@@ -4,6 +4,8 @@ import {Alert, Button, Checkbox, Intent, Radio, RadioGroup, Spinner} from '@blue
 import {IconNames} from '@blueprintjs/icons';
 import Portal from 'react-portal';
 
+import {setPersistentOption} from './options';
+
 export default function (bundle) {
 
   bundle.defineView('SubtitlesMenu', SubtitlesMenuSelector, SubtitlesMenu);
@@ -89,7 +91,7 @@ class SubtitlesPopup extends React.PureComponent {
           </div>
           {isLoaded &&
             <div style={{textAlign: 'center'}}>
-              <a href={availableOptions[loadedKey].url} className='pt-button pt-small pt-icon-download' target='_blank' download>
+              <a href={availableOptions[loadedKey].url} className='bp3-button bp3-small bp3-icon-download' target='_blank' download>
                 {getMessage('CLOSED_CAPTIONS_DOWNLOAD_SELECTED')}
               </a>
             </div>}
@@ -107,9 +109,11 @@ class SubtitlesPopup extends React.PureComponent {
   _selectSubtitles = (event) => {
     const key = event.target.value;
     if (key === 'none') {
+      setPersistentOption("language", "none");
       this.props.dispatch({type: this.props.subtitlesCleared});
     } else {
       const option = this.props.availableOptions[key];
+      setPersistentOption("language", option.value);
       this.props.dispatch({type: this.props.subtitlesLoadFromUrl, payload: option});
     }
   };

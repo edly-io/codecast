@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {Icon} from '@blueprintjs/core';
+import {AnchorButton, Icon, Label} from '@blueprintjs/core';
 import url from 'url';
 
 export default function (bundle, deps) {
@@ -9,8 +9,8 @@ export default function (bundle, deps) {
   bundle.defineView('ExamplePicker', ExamplePickerSelector, ExamplePicker);
 }
 
-function initReducer (state, {payload}) {
-  return state.set('examples', updateExamplesState(state, payload));
+function initReducer (state, _action) {
+  return state.set('examples', updateExamplesState(state, {}));
 }
 
 function optionsChangedReducer (state) {
@@ -18,20 +18,20 @@ function optionsChangedReducer (state) {
 }
 
 function updateExamplesState (state, examples) {
-  const {callbackUrl, examplesUrl} = examples;
+  const {callbackUrl, examplesUrl, platform, language} = state.get('options');
   if (!examplesUrl) return false;
   /* Clean up the callback URL to avoid passing the current source to the
-     examples selector.  Also clear 'mode' in case the user changes it in
-     the selector. */
+     examples selector.  Also clear 'platform' in case the user changes it
+     in the selector. */
   let fullCallbackUrl = url.parse(callbackUrl, true);
   delete fullCallbackUrl.search; // force url.format to rebuild the search string
   delete fullCallbackUrl.query.source;
-  delete fullCallbackUrl.query.mode;
+  delete fullCallbackUrl.query.platform;
+  fullCallbackUrl.query.language = language;
   fullCallbackUrl = url.format(fullCallbackUrl);
-  const {mode, language} = state.get('options');
   let fullExamplesUrl = url.parse(examplesUrl, true);
   fullExamplesUrl.query.target = '_self';
-  fullExamplesUrl.query.tags = mode;
+  fullExamplesUrl.query.tags = platform;
   /* XXX better to pass language unchanged and have the examples app drop the country code */
   fullExamplesUrl.query.lang = language.replace(/_.*$/, '');
   fullExamplesUrl.query.callback = fullCallbackUrl;
@@ -51,11 +51,13 @@ class ExamplePicker extends React.PureComponent {
     if (disabled || !examplesUrl) return false;
     return (
       <div>
-        <p>
-          {getMessage('EXAMPLES_LABEL')}{' '}
-          <a className='btn btn-default' href={examplesUrl}>
+        <label className='bp3-label'>
+          {getMessage('EXAMPLES_LABEL')}
+          <AnchorButton href={examplesUrl} rightIcon='share' >
             {getMessage('EXAMPLES_BUTTON_TITLE')}
-          </a>{' '}
+          </AnchorButton>
+        </label>
+        <p>
           <Icon icon='warning-sign'/>{' '}
           {getMessage('EXAMPLES_MESSAGE')}
         </p>

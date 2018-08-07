@@ -41,8 +41,8 @@ class PlayerControls extends React.PureComponent {
           <div className="player-slider-container">
             {!Number.isNaN(duration) &&
               <Slider value={audioTime} onChange={this.onSeek}
-                stepSize={100} labelStepSize={30000} min={0} max={duration}
-                labelRenderer={formatTime} />}
+                min={0} max={duration} stepSize={100}
+                labelStepSize={duration} labelRenderer={formatTime} />}
           </div>
         </div>
         <div className='player-controls-row row' style={{width: '100%', marginBottom: '4px'}}>

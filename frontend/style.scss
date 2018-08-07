@@ -29,6 +29,11 @@ $bootstrap-sass-asset-helper: '~/bootstrap-sass/assets';
 @import "./player/style.scss";
 @import "./editor/style.scss";
 
+html {
+    margin-left: calc(100vw - 100%);
+    margin-right: 0;
+}
+
 /* Darker icons on blueprint buttons. */
 .bp3-button .bp3-icon, .bp3-button .bp3-icon-standard, .bp3-button .bp3-icon-large {
   color: #3c5060;
@@ -43,7 +48,6 @@ $bootstrap-sass-asset-helper: '~/bootstrap-sass/assets';
 #main {
   margin: 0 auto;
 }
-
 
 .fi {
   display: inline-block;
@@ -152,11 +156,31 @@ body#app, #app h1, #app h2, #app h3 {
 }
 #app .navbar {
   min-height: 28px;
+  margin-top: 20px;
+  margin-bottom: 30px;
 }
-#app .navbar-nav > li > a {
-  padding: 1px 4px;
+#app .navbar-nav > li > a{
   min-width: 48px;
+  font-size: medium;
   text-align: center;
+  margin: 10px;
+}
+#app .navbar-nav > li > span{
+  min-width: 48px;
+  font-size: 18px;
+  text-align: center;
+  margin: 10px;
+  display: block;
+  padding-top: 12px;
+  padding-bottom: 15px;
+}
+#app .navbar-brand{
+  font-size: 26px;
+  margin: 10px;
+}
+
+#app {
+  background-color: #f5f5f5 !important;
 }
 
 
@@ -750,10 +774,10 @@ svg {
   font-size: 12px;
 }
 .subtitles-item:hover {
-  background: #ccc;
+  background: #eee;
 }
 .subtitles-item-selected {
-    background: #eee;
+    background: #ccc;
 }
 .subtitles-band {
   position: fixed;

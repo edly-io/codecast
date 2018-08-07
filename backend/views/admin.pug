@@ -1,0 +1,21 @@
+extends layout
+
+block content
+    div(style='width: 60%; margin: 0 auto;')
+        - function capitalize(s) {return s.charAt(0).toUpperCase() + s.slice(1);};
+        if context.user
+                script.
+                    window.localStorage.setItem('user', '!{context.user}');
+        div.row.dashboard.text-center
+            div.col-md-2
+            div.col-md-4.thumbnail
+                a(href="/admin/users")
+                    div.caption
+                        h1 Users
+                    img(src="../../assets/persons.png")
+            div.col-md-4.thumbnail
+                a(href="/admin/records")
+                    div.caption
+                        h1 Records
+                    img(src="../../assets/recorder.png")
+            div.col-md-2

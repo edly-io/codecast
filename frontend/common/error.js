@@ -4,7 +4,9 @@ import {Dialog} from '@blueprintjs/core';
 
 export default function (bundle) {
   bundle.defineAction('error', 'Error');
+  bundle.defineAction('clearError', 'Error.Clear');
   bundle.addReducer('error', errorReducer);
+  bundle.addReducer('clearError', clearErrorReducer);
   bundle.defineView('AppErrorBoundary', AppErrorBoundarySelector, AppErrorBoundary);
 }
 
@@ -15,10 +17,6 @@ function AppErrorBoundarySelector (state) {
 }
 
 class AppErrorBoundary extends React.Component {
-  componentDidCatch (error, info) {
-    const {dispatch, actionTypes} = this.props;
-    dispatch({type: actionTypes.error, payload: {source: 'react', error, info}});
-  }
   render() {
     const {lastError, children} = this.props;
     if (!lastError) {
@@ -33,7 +31,7 @@ class AppErrorBoundary extends React.Component {
             onClose={this._clearError}
             title={"Something went wrong"}
         >
-          <div className='pt-dialog-body'>
+          <div className='bp3-dialog-body'>
             <p>{"Source: "}{source}</p>
             <p style={{fontWeight: 'bold'}}>{(error||'').toString()}</p>
             {source === 'react' &&
@@ -45,11 +43,21 @@ class AppErrorBoundary extends React.Component {
       </div>
     );
   }
+  componentDidCatch (error, info) {
+    const {dispatch, actionTypes} = this.props;
+    dispatch({type: actionTypes.error, payload: {source: 'react', error, info}});
+  }
   _clearError = () => {
+    const {dispatch, actionTypes} = this.props;
+    this.props.dispatch({type: actionTypes.clearError});
   };
 }
 
 function errorReducer (state, {payload}) {
   console.log("GENERIC ERROR", payload);
   return state.set('lastError', payload);
+}
+
+function clearErrorReducer (state, _action) {
+  return state.set('lastError', undefined);
 }
