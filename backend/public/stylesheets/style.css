@@ -1,0 +1,76 @@
+html,
+body {
+  height: 100%;
+}
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: #fff;
+  align-content: center;
+  font-family: "Open Sans";
+}
+
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+
+input[type="password"], 
+input[type="email"], 
+input[type="text"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin: auto;
+  width: auto;
+  margin-top: 10px;
+}
+
+button[type="submit"] {
+  margin: auto;
+  width: auto;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+table {
+  align-content: center;
+}
+
+.btn-success{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.navbar-brand{
+  font-size: 26px !important;
+  margin: 10px;
+  padding: 15px 15px !important;
+}
+
+.navbar-nav > li > span{
+  min-width: 48px;
+  font-size: 18px;
+  text-align: center;
+  margin: 10px;
+  display: block;
+  padding-top: 12px;
+  padding-bottom: 15px;
+}
+
+.navbar-nav > li > a{
+  min-width: 48px;
+  text-align: center;
+  margin: 10px;
+  display: block;
+  padding: 15px 12px;
+  font-size: medium;
+}
+
+.navbar{
+  min-height: 28px;
+  margin-bottom: 30px;
+}
+
+th{
+  text-align: center;
+}

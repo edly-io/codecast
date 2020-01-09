@@ -1,0 +1,57 @@
+extends layout
+block content
+    div(style='width: 60%; margin: 0 auto;')
+        script
+            if context.user
+                | window.localStorage.setItem('user', '!{context.user}');
+        div.text-center
+            h2 Admin Panel
+
+        div.text-center(style='margin-top:30px')
+            h3 All Users
+            table(style='width:100%', border='1')
+                tr
+                    th ID
+                    th Email
+                    th Active
+                    th Admin
+                    th Actions
+                if context && context.users
+                    each val, index in context.users
+                        tr
+                            td #{val.id}
+                            td #{val.emailId}
+                            td #{!!val.isActive}
+                            td #{!!val.isAdmin}
+                            td None
+            a(href="/signup" class="btn btn-success") Add Users
+
+        div.text-center(style='margin-top:30px')
+            h3 All Recordings
+
+            table(style='width:100%', border='1')
+                tr
+                    th Creator
+                    th Published
+                    th Records
+                    th Actions
+                if context && context.records
+                    each val, index in context.records
+                        tr
+                            td #{val.creator}
+                            td #{val.publishDate}
+                            td
+                                a(href=`/player?base=${encodeURIComponent(val.link)}` target="player") PLAYER
+                                |  | 
+                                a(href=`/editor?base=${encodeURIComponent(val.link)}` target="editor") EDITOR
+                            td 
+                                form(class="form-signin" method="POST" action="/delete")
+                                    input(type="hidden" name="recordId" value=`${val.id}`)
+                                    - var buttonClass=['btn', 'btn-danger'];
+                                    button(class=buttonClass type="submit") Delete
+                else
+                    tr
+                        td(colspan="4") No Records Found
+
+            a(href="/recorder" class="btn btn-success") Add Record
+

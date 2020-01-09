@@ -8,7 +8,7 @@ class RecorderApp extends React.PureComponent {
     const {RecorderGlobalControls, Screen, MemoryUsage, Vumeter} = this.props;
     return (
       <div className='container'>
-        <RecorderGlobalControls/>
+        {/* <RecorderGlobalControls/> */}
         <div id='page-level-controls'>
           <div>
             <MemoryUsage/>

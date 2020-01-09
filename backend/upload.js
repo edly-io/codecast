@@ -58,6 +58,16 @@ export function deleteObject (s3, bucket, key) {
   return s3.deleteObjects(params).promise();
 };
 
+export function deleteObjects (s3, bucket, keys) {
+  const params = {
+    Bucket: bucket,
+    Delete: {
+      Objects: keys,
+    },
+  };
+  return s3.deleteObjects(params).promise();
+};
+
 // save({accessKeyId, secretAccessKey, region, bucket});
 
 /*
