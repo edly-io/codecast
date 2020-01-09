@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 
 exports.storeRecord = function (userId, baseUrl, recordId, dbConfig) {
-    let sql = `INSERT INTO records(id, creator, link) VALUES ('${recordId}', '${userId}', '${baseUrl}')`;
+    const sql = `INSERT INTO records(id, creator, link) VALUES ('${recordId}', '${userId}', '${baseUrl}')`;
     const db = mysql.createConnection(dbConfig);
     db.query(sql, function (err, results) {
         db.end();
@@ -12,7 +12,7 @@ exports.storeRecord = function (userId, baseUrl, recordId, dbConfig) {
 };
 
 exports.deleteRecord = function (recordId, dbConfig) {
-    let sql = `DELETE FROM records WHERE id='${recordId}'`;
+    const sql = `DELETE FROM records WHERE id='${recordId}'`;
     const db = mysql.createConnection(dbConfig);
     db.query(sql, function (err, results) {
         db.end();
@@ -23,7 +23,7 @@ exports.deleteRecord = function (recordId, dbConfig) {
 };
 
 exports.userHavePrivileges = function (recordId, userId, dbConfig, callback) {
-    let sql = `SELECT * FROM records WHERE id='${recordId}' and creator='${userId}'`;
+    const sql = `SELECT * FROM records WHERE id='${recordId}' and creator='${userId}'`;
     const db = mysql.createConnection(dbConfig);
     db.query(sql, function (err, rows) {
         db.end();
@@ -50,12 +50,11 @@ exports.getRecords = function (userId, isAdmin, dbConfig, callback) {
             let records = {};
             if (results.length) {
                 results.forEach(function (item, index) {
-                    let creator = (item.email_id) ? item.email_id : item.creator;
                     records[item.id] = {
                         id: item.id,
-                        creator: creator,
                         publishDate: item.publish_date,
-                        link: item.link
+                        link: item.link,
+                        creator: (item.email_id) ? item.email_id : item.creator,
                     }
                 });
                 callback(null, records);
@@ -67,7 +66,7 @@ exports.getRecords = function (userId, isAdmin, dbConfig, callback) {
 }
 
 exports.getAllUsers = function (dbConfig, callback) {
-    let sql = "Select id, email_id, is_active, is_admin from users";
+    const sql = "Select id, email_id, is_active, is_admin from users";
     const db = mysql.createConnection(dbConfig);
     db.query(sql, function (err, results) {
         db.end();

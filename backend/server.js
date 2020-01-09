@@ -192,9 +192,8 @@ function addBackendRoutes(app, config, store) {
             if (err) return res.json({ error: err.toString() });
             const baseUrl = `https://${s3Bucket}.s3.amazonaws.com/${uploadPath}`;
             const player_url = `${config.playerUrl}?base=${encodeURIComponent(baseUrl)}`;
-            if (config.database) {
+            if (!config.enableOauth && config.database) 
               mysqlUtils.storeRecord(req.session.userId, baseUrl, id, config.database);
-            }
             res.json({ player_url, events, audio });
           });
         });
@@ -203,8 +202,8 @@ function addBackendRoutes(app, config, store) {
   });
 
   app.post('/delete', checkLogin, function (req, res) {
-    let recordId = req.body.recordId;
 
+    let recordId = req.body.recordId;
     if (req.session.context.isAdmin) {
       deleteRecord(true);
     } else {
@@ -222,16 +221,14 @@ function addBackendRoutes(app, config, store) {
           selectTarget(userConfig, userConfig['grants'][0], function (err, target) {
             if (err) return res.json({ error: err.toString() });
             const { s3Bucket, uploadPath: uploadDir } = target;
-            let s3Client = upload.makeS3Client(target);
-            let uploadPath = `${uploadDir}/${recordId}`;
-            let keys = [
-              { Key: `${uploadPath}.mp3` },
-              { Key: `${uploadPath}.json` },
+            const s3Client = upload.makeS3Client(target);
+            const keys = [
+              { Key: `${uploadDir}/${recordId}.mp3` },
+              { Key: `${uploadDir}/${recordId}.json` },
             ]
             upload.deleteObjects(s3Client, s3Bucket, keys).then(function (data) {
-              if (config.database) {
+              if (!config.enableOauth && config.database) 
                 mysqlUtils.deleteRecord(recordId, config.database);
-              }
               console.log("record deleted successfully", data);
               res.redirect(req.get('Referrer'));
             }).catch(function (err) {
