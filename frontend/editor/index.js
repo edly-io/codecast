@@ -183,7 +183,8 @@ class EditorApp extends React.PureComponent {
     return (
       <div id='editor-app'>
         <div>
-          {/* <span className='collapse-toggle' onClick={this._toggleCollapsed}>
+          {/* <div id='floating-controls' className={classnames({collapsed})}>
+          <span className='collapse-toggle' onClick={this._toggleCollapsed}>
             <Icon icon={`chevron-${collapsed ? 'down' : 'up'}`}/>
           </span> */}
           <div className='btn-group'>

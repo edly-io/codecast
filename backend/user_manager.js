@@ -15,7 +15,7 @@ module.exports = function (app, config, callback) {
     app.use(session({ ...config.session, store: store }));
 
     app.get('/login', function (req, res) {
-        if (req.session.context.isActive) {
+        if (req.session.context && req.session.context.isActive) {
             res.redirect('/dashboard');
         } else {
             res.render('login.pug');
