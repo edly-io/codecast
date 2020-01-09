@@ -137,6 +137,7 @@ function addBackendRoutes(app, config, store) {
 
   app.get('/editor', function (req, res) {
     buildOptions(config, req, 'editor', function (err, options) {
+      if (err) return res.send(`Error: ${err.toString()}`);
 
       let base = req.query.base;
       if (base) {
@@ -155,8 +156,7 @@ function addBackendRoutes(app, config, store) {
 
         function editRecords(flag) {
           if (flag) {
-            if (err) return res.send(`Error: ${err.toString()}`);
-            let context = {
+            const context = {
               username: req.session.identity.login,
             }
             res.render('index', {

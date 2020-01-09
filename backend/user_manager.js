@@ -15,7 +15,11 @@ module.exports = function (app, config, callback) {
     app.use(session({ ...config.session, store: store }));
 
     app.get('/login', function (req, res) {
-        res.render('login.pug');
+        if (req.session.context.isActive) {
+            res.redirect('/dashboard');
+        } else {
+            res.render('login.pug');
+        }
     });
 
     app.get('/signup', checkAdmin, function (req, res) {
@@ -38,9 +42,9 @@ module.exports = function (app, config, callback) {
     });
 
     app.get('/admin', checkLogin, checkAdmin, function (req, res) {
-        let userId = req.session.userId;
-        let isAdmin = req.session.context.isAdmin;
-        let username = req.session.context.username;
+        const userId = req.session.userId;
+        const isAdmin = req.session.context.isAdmin;
+        const username = req.session.context.username;
         mysqlUtils.getAllUsers(config.database, function (err, users) {
             mysqlUtils.getRecords(userId, isAdmin, config.database, function (err, records) {
                 res.render('admin.pug', {
@@ -57,10 +61,9 @@ module.exports = function (app, config, callback) {
     });
 
     app.post('/signup', checkLogin, checkAdmin, function (req, res) {
-        let post = req.body;
-        let email = post.email;
-        let pass = md5(post.password);
-        let sql = `INSERT INTO users(email_id, password) VALUES ('${email}', '${pass}')`;
+        const email = req.body.email;
+        const pass = md5(req.body.password);
+        const sql = `INSERT INTO users(email_id, password) VALUES ('${email}', '${pass}')`;
         const db = mysql.createConnection(config.database);
         db.query(sql, function (err, results) {
             db.end();
@@ -75,9 +78,9 @@ module.exports = function (app, config, callback) {
     });
 
     app.post('/login', function (req, res) {
-        let email = req.body.email;
-        let pass = md5(req.body.password);
-        let sql = `SELECT id, email_id, is_active, is_admin, bucket_id FROM users WHERE email_id='${email}' and password='${pass}'`;
+        const email = req.body.email;
+        const pass = md5(req.body.password);
+        const sql = `SELECT id, email_id, is_active, is_admin, bucket_id FROM users WHERE email_id='${email}' and password='${pass}'`;
         const db = mysql.createConnection(config.database);
         db.query(sql, function (err, results) {
             if (err) {
@@ -88,23 +91,22 @@ module.exports = function (app, config, callback) {
                     req.session.userId = results[0].id;
                     req.session.bucketId = results[0].bucket_id;
 
-                    req.session.identity = {
-                        id: results[0].id,
-                        login: results[0].email_id,
-                    };
-
                     req.session.context = {
                         username: results[0].email_id,
                         isActive: results[0].is_active,
                         isAdmin: results[0].is_admin
                     }
 
+                    req.session.identity = {
+                        id: results[0].id,
+                        login: results[0].email_id,
+                    };
+
                     db.end();
                     return userLogin(req, res);
                 }
                 else {
-                    let message = 'Wrong Credentials';
-                    res.render('login.pug', { message: message });
+                    res.render('login.pug', { message: 'Wrong Credentials' });
                 }
             }
         });
@@ -141,13 +143,6 @@ module.exports = function (app, config, callback) {
         }
         return { id, login, grants };
     }
-
-    config.optionsHook = function (req, options, callback) {
-        const authProviders = [];
-        authProviders.push('guest');
-        const user = getFrontendUser(req.session);
-        callback(null, { ...options, authProviders, user });
-    };
 
     config.getUserConfig = function (req, callback) {
         getUserConfig(req.session.bucketId, callback);
