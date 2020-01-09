@@ -1,29 +1,34 @@
 
-# Try it
-
-The most recent production version can be used
-[here](https://codecast.france-ioi.org/v5/).
-
-The development version can be tried
-[here](https://codecast.france-ioi.org/next/).
-This version can break compatibility with past production releases, that
-is, there is no expectation that recordings made on the development
-version will remain readable.
-
 # Quick start
 
-Build `c-to-json` and copy the executable at the root of this project.
+Build [c-to-json](https://github.com/epixode/c-to-json/issues/1#issuecomment-390388305) and copy the executable at the root of this project.
 
-Copy `config.json.template` to `config.json` and edit it.
+Copy `config.json.template` to `config.json` and edit it like this.
 
-If not using oauth2, remove keys "database", "session" and "auth" and
-fill in settings in "configs" and "tokens".
+{
+  "port": 8001,
+  "baseUrl": "http://localhost:8001",
+  "mountPath": "/",
+  "database": {
+    "host"     : "localhost",
+    "port"     : "3306",
+    "user"     : "root",
+    "password" : "password",
+    "database" : "codecast"
+  },
+  "session": {
+    "secret": "secret",
+    "resave": false,
+    "saveUninitialized": true,
+    "cookie": {"secure": false, "maxAge": 604800}
+  },
+  "enableOauth": false
+}
 
-If using oauth2, fill in settings in "database", "session" and "auth",
-and remove keys "configs" and "tokens".  Use oauth2_schema.sql, and
-add rows in user_configs where value is a json object with keys
-"s3AccessKeyId", "s3SecretAccessKey", "s3Region", "s3Bucket", and
-"uploadPath".  The row with user_id 0 is used for guest settings.
+Use `user_management.sql` to create the database.
+
+Add an S3Bucket Credentials in `buckets` table having `(bucket_id, value)` as `INSERT INTO buckets (bucket_id, value) values (0,'{ \"s3AccessKeyId\": \"<ACCESS-KEY>\", \"s3SecretAccessKey\": \"<SECRET>\", \"s3Region\": \"<REGION>\", \"s3Bucket\": \"<BUCKET>\", \"uploadPath\": \"<UPLOAD-PATH-IN-S3>\" }');`
+
 
 Start with these commands:
 
