@@ -135,7 +135,7 @@ function addBackendRoutes(app, config, store) {
     });
   });
 
-  app.get('/editor', function (req, res) {
+  app.get('/editor', checkLogin, function (req, res) {
     buildOptions(config, req, 'editor', function (err, options) {
       if (err) return res.send(`Error: ${err.toString()}`);
 

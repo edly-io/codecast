@@ -158,10 +158,20 @@ class SaveScreen extends React.PureComponent {
           <ProgressBar value={progress} />}
         {playerUrl &&
           <FormGroup labelFor='playerUrlInput' label={getMessage('PLAYBACK_LINK')}>
-            <input id='playerUrlInput' type='text' className='bp3-input bp3-fill' value={playerUrl} readOnly/>
+            <input id='playerUrlInput' type='text' className='bp3-input bp3-fill' value={playerUrl} readOnly />
+          </FormGroup>}
+          {playerUrl &&
+          <FormGroup labelFor='playerUrlIFrame' label={getMessage('IFRAME_LINK')}>
+            <input id='playerUrlIFrame' type='text' className='bp3-input bp3-fill' value={this.generateIframeLink(playerUrl)} readOnly />
           </FormGroup>}
       </form>
     );
+  }
+
+  generateIframeLink(playerlink){
+    return `<p><iframe src="${playerlink}" width="100%" height="1000" marginwidth="0" marginheight="0" frameborder="0">
+            </iframe>
+            </p>`;
   }
 
   static getDerivedStateFromProps (props, state) {

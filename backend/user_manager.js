@@ -35,6 +35,7 @@ module.exports = function (app, config, callback) {
                 context['user'] = req.session.user;
                 context['records'] = records;
                 res.render('dashboard', {
+                    baseUrl: config.baseUrl,
                     context,
                 });
             });
@@ -48,6 +49,7 @@ module.exports = function (app, config, callback) {
         mysqlUtils.getAllUsers(config.database, function (err, users) {
             mysqlUtils.getRecords(userId, isAdmin, config.database, function (err, records) {
                 res.render('admin.pug', {
+                    baseUrl: config.baseUrl,
                     context: {
                         users: users,
                         records: records,

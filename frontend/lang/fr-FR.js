@@ -22,6 +22,7 @@ module.exports = {
   UPLOADING_ERROR: "Une erreur est survenue lors de l'enregistrement.",
   UPLOADING_COMPLETE: "Enregistrement terminé !",
   PLAYBACK_LINK: "Lien pour la lecture",
+  IFRAME_LINK: "Lien pour la iframe",
   IOPANE_MODE: "Mécanisme d'entrée/sortie :",
   IOPANE_MODE_SPLIT: "Entrée/sortie séparés",
   IOPANE_MODE_INTERACTIVE: "Terminal interactif",
