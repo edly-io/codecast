@@ -74,3 +74,7 @@ table {
 th{
   text-align: center;
 }
+
+#recordNameInput{
+  width: 300px;
+}

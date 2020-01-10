@@ -144,6 +144,9 @@ class SaveScreen extends React.PureComponent {
         <FormGroup label="Target">
           <HTMLSelect options={grantOptions} value={targetUrl} onChange={this.handleTargetChange} />
         </FormGroup>
+        <FormGroup labelFor='recordNameInput' label={"Recording Name"}>
+          <input id='recordNameInput' type='text' maxlength='30' placeholder="recording name here" className='bp3-input' onChange={this.handleNameChange} required/>
+        </FormGroup>
         <Button onClick={this.onUpload} disabled={!canUpload} intent={canUpload ? Intent.PRIMARY : Intent.NONE}
           icon='floppy-disk' text="Save" />
         <div>
@@ -188,9 +191,14 @@ class SaveScreen extends React.PureComponent {
     this.setState({targetUrl: event.target.value});
   };
 
+  handleNameChange = (event) => {
+    this.setState({targetName: event.target.value});
+  };
+
   onUpload = () => {
-    const {targetUrl} = this.state;
+    const {targetUrl, targetName} = this.state;
     const grant = this.props.grants.find(grant => grant.url === targetUrl);
+    grant['targetName'] = targetName;
     if (grant) {
       this.props.dispatch({type: this.props.actionTypes.saveScreenUpload, payload: {target: grant}});
     }

@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 
-exports.storeRecord = function (userId, baseUrl, recordId, dbConfig) {
-    const sql = `INSERT INTO records(id, creator, link) VALUES ('${recordId}', '${userId}', '${baseUrl}')`;
+exports.storeRecord = function (userId, recordName, baseUrl, recordId, dbConfig) {
+    const sql = `INSERT INTO records(id, name, creator, link) VALUES ('${recordId}', '${recordName}','${userId}', '${baseUrl}')`;
     const db = mysql.createConnection(dbConfig);
     db.query(sql, function (err, results) {
         db.end();
@@ -41,7 +41,7 @@ exports.userHavePrivileges = function (recordId, userId, dbConfig, callback) {
 };
 
 exports.getRecords = function (userId, isAdmin, dbConfig, callback) {
-    let sql = "SELECT records.id, records.creator,  DATE_FORMAT(records.publish_date, '%Y-%m-%d %r') publish_date, records.link, users.email_id FROM records LEFT JOIN users ON records.creator=users.id";
+    let sql = "SELECT records.id, records.creator, records.name,  DATE_FORMAT(records.publish_date, '%Y-%m-%d %r') publish_date, records.link, users.email_id FROM records LEFT JOIN users ON records.creator=users.id";
     if (!isAdmin) sql += ` WHERE creator='${userId}'`;
     const db = mysql.createConnection(dbConfig);
     db.query(sql, function (err, results) {
@@ -52,6 +52,7 @@ exports.getRecords = function (userId, isAdmin, dbConfig, callback) {
                 results.forEach(function (item, index) {
                     records[item.id] = {
                         id: item.id,
+                        name: item.name,
                         publishDate: item.publish_date,
                         link: item.link,
                         creator: (item.email_id) ? item.email_id : item.creator,

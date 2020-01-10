@@ -33,8 +33,9 @@ block content
 
             table(class='table-hover table-bordered' style='width:100%; line-height:2.5')
                 tr
-                    th Creator
-                    th Published
+                    th Publisher
+                    th Name
+                    th Creation Date
                     th Records
                     th IFrame Link
                     th Actions
@@ -42,6 +43,7 @@ block content
                     each val, index in context.records
                         tr
                             td #{capitalize(val.creator)}
+                            td #{val.name}
                             td #{val.publishDate}
                             td
                                 a(href=`/player?base=${encodeURIComponent(val.link)}` target="player") PLAYER
@@ -57,6 +59,6 @@ block content
                                     button(class=buttonClass type="submit") Delete
                 else
                     tr
-                        td(colspan="4") No Records Found
+                        td(colspan="6") No Records Found
 
             a(href="/recorder" class="btn btn-success") Add Record

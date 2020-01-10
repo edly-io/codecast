@@ -184,6 +184,7 @@ function addBackendRoutes(app, config, store) {
         if (err) return res.json({ error: err.toString() });
         const s3client = upload.makeS3UploadClient(target);
         const { s3Bucket, uploadPath: uploadDir } = target;
+        const targetName = req.body.targetName;
         const id = Date.now().toString();
         const uploadPath = `${uploadDir}/${id}`;
         upload.getJsonUploadForm(s3client, s3Bucket, uploadPath, function (err, events) {
@@ -192,8 +193,8 @@ function addBackendRoutes(app, config, store) {
             if (err) return res.json({ error: err.toString() });
             const baseUrl = `https://${s3Bucket}.s3.amazonaws.com/${uploadPath}`;
             const player_url = `${config.playerUrl}?base=${encodeURIComponent(baseUrl)}`;
-            if (!config.enableOauth && config.database) 
-              mysqlUtils.storeRecord(req.session.userId, baseUrl, id, config.database);
+            if (!config.enableOauth && config.database)
+              mysqlUtils.storeRecord(req.session.userId, targetName, baseUrl, id, config.database);
             res.json({ player_url, events, audio });
           });
         });
