@@ -186,3 +186,43 @@ exports.getAllUsers = function (mysqlConnPool, callback) {
     });
 
 }
+
+
+exports.deleteUser = function (userId, mysqlConnPool, callback) {
+    const sql = `DELETE FROM users WHERE id=${userId}`;
+    mysqlConnPool.getConnection(function (err, conn) {
+        if (!err) {
+            conn.query(sql, function (err, result) {
+                conn.release();
+                if (err) {
+                    console.error(`error deleting user: ${err}`)
+                    return dbError(err, callback);
+                } else {
+                    return callback(null, true);
+                }
+            });
+        } else {
+            return dbError(err, callback);
+        }
+    });
+}
+
+
+exports.toggleUserActivation = function (userActivationBeingToggled, mysqlConnPool, callback) {
+    const sql = `UPDATE users SET is_active = 1 - is_active  WHERE id=${userActivationBeingToggled}`;
+    mysqlConnPool.getConnection(function (err, conn) {
+        if (!err) {
+            conn.query(sql, function (err, result) {
+                conn.release();
+                if (err) {
+                    console.error(`error toggling user activation: ${err}`)
+                    return dbError(err, callback);
+                } else {
+                    return callback(null, true);
+                }
+            });
+        } else {
+            return dbError(err, callback);
+        }
+    });
+}

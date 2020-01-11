@@ -202,7 +202,6 @@ function addBackendRoutes(app, config, store) {
   });
 
   app.post('/record/delete', checkLogin, function (req, res) {
-
     const recordId = req.body.recordId;
     if (req.session.context.isAdmin) {
       deleteRecord();
@@ -232,10 +231,10 @@ function addBackendRoutes(app, config, store) {
               mysqlUtils.deleteRecord(recordId, config.mysqlConnPool);
             }
             console.log("record deleted successfully", data);
-            res.redirect(req.get('Referrer'));
+            res.status(200).send('Record deleted successfully.');
           }).catch(function (err) {
             console.error("error while deleting record", err);
-            res.redirect(req.get('Referrer'));
+            res.status(500).send('Record deletion failed because of db related error.');
           });
         });
       });
@@ -362,4 +361,3 @@ fs.readFile('config.json', 'utf8', function (err, data) {
     workerStore.dispatch({ type: 'START' });
   });
 });
-
