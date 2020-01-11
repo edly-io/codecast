@@ -14,8 +14,8 @@ body {
   z-index: 2;
 }
 
-input[type="password"], 
-input[type="email"], 
+input[type="password"],
+input[type="email"],
 input[type="text"] {
   margin-bottom: 10px;
   border-top-left-radius: 0;
@@ -73,6 +73,17 @@ table {
 
 th{
   text-align: center;
+}
+
+ul.user-actions {
+  display: inline-block;
+  margin-bottom: -10px;
+}
+
+ul.user-actions li {
+  margin: 5px;
+  float: left;
+  list-style: none;
 }
 
 #recordNameInput{

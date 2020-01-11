@@ -74,6 +74,45 @@ module.exports = function (app, config, callback) {
         });
     });
 
+    app.post('/user/delete', checkLogin, checkAdmin, function (req, res) {
+        let userBeingDeleted = parseInt(req.body.userId);
+        // Only admin can delete the other user and nobody can delete admin
+        let userRequestedForDeletion = req.session.userId;
+        if (userBeingDeleted === userRequestedForDeletion) {
+            return res.status(406).send("Admin can't delete himself.");
+        }
+        const sql = `DELETE FROM users WHERE id=${userBeingDeleted}`;
+        const db = mysql.createConnection(config.database);
+        db.query(sql, function (err, results) {
+            db.end();
+            if (!err) {
+                res.status(200).send('User has been successfully deleted.')
+            } else {
+                Object.entries(err);
+                res.status(500).send('Failed to delete the requested user because of db related error.')
+            }
+        });
+    });
+
+    app.post('/user/toggle/activation', checkLogin, checkAdmin, function (req, res) {
+        let userActivationBeingToggled = parseInt(req.body.userId);
+        let currentLoggedInUser = req.session.userId;
+        if (userActivationBeingToggled === currentLoggedInUser) {
+            return res.status(406).send("Admin can't toggle its own activation.");
+        }
+        const sql = `UPDATE users SET is_active = 1 - is_active  WHERE id=${userActivationBeingToggled}`;
+        const db = mysql.createConnection(config.database);
+        db.query(sql, function (err, results) {
+            db.end();
+            if (!err) {
+                res.status(200).send('User activation has been successfully toggled.')
+            } else {
+                console.log(err);
+                res.status(500).send('Failed to toggle the requested user activation because of db related error.')
+            }
+        });
+    });
+
     app.post('/login', function (req, res) {
         const email = req.body.email;
         const pass = md5(req.body.password);

@@ -20,12 +20,26 @@ block content
                     th Actions
                 if context && context.users
                     each val, index in context.users
-                        tr
+                        tr(id=`user-row-${val.id}`)
                             td #{val.id}
-                            td #{capitalize(val.emailId)}
+                            td #{val.emailId}
                             td #{capitalize((!!val.isActive).toString())}
                             td #{capitalize((!!val.isAdmin).toString())}
-                            td None
+                            td
+                                if val.isAdmin
+                                    p N/A
+                                else
+                                    ul(class='user-actions')
+                                        li
+                                            form(onsubmit="validateToggleUserActivation(this); return false" action="#")
+                                                input(type="hidden" name="userId" value=`${val.id}`)
+                                                button(class=(val.isActive) ? "btn" : "btn btn-primary" type="submit" style="width:100px") #{val.isActive ? "Deactivate" : "Activate"}
+                                        li
+                                            form(onsubmit="validateUserDeletion(this); return false" action="#")
+                                                input(type="hidden" name="userId" value=`${val.id}`, data-email=`${val.emailId}`)
+                                                - var deleteButtonClass=['btn', 'btn-danger'];
+                                                button(class=deleteButtonClass type="submit") Delete
+
             a(href="/user/add" class="btn btn-success") Add Users
 
         div.text-center(style='margin-top:30px')
@@ -47,7 +61,7 @@ block content
                             td #{val.publishDate}
                             td
                                 a(href=`/player?base=${encodeURIComponent(val.link)}` target="player") PLAYER
-                                |  | 
+                                |  | <!-- To add double spaces. -->
                                 a(href=`/editor?base=${encodeURIComponent(val.link)}` target="editor") EDITOR
                             td
                                 - var iframeButtonClass=['btn', 'btn-success'];
