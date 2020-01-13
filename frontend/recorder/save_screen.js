@@ -145,7 +145,7 @@ class SaveScreen extends React.PureComponent {
           <HTMLSelect options={grantOptions} value={targetUrl} onChange={this.handleTargetChange} />
         </FormGroup>
         <FormGroup labelFor='recordNameInput' label={"Recording Name"}>
-          <input id='recordNameInput' type='text' maxlength='30' placeholder="recording name here" className='bp3-input' onChange={this.handleNameChange} required/>
+          <input id='recordNameInput' type='text' maxLength='30' placeholder="recording name here" className='bp3-input' onChange={this.handleNameChange} required/>
         </FormGroup>
         <Button onClick={this.onUpload} disabled={!canUpload} intent={canUpload ? Intent.PRIMARY : Intent.NONE}
           icon='floppy-disk' text="Save" />

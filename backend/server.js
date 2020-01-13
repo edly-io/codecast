@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import { spawn } from 'child_process';
 import AnsiToHtml from 'ansi-to-html';
 import url from 'url';
+import mysql from 'mysql';
 
 import * as upload from './upload';
 import directives from './directives';
@@ -146,28 +147,26 @@ function addBackendRoutes(app, config, store) {
         if (req.session.context.isAdmin) {
           editRecords(true);
         } else {
-          mysqlUtils.userHavePrivileges(
-            base,
-            req.session.userId,
-            config.database,
-            editRecords
-          );
+          const userId = req.session.context.userId;
+          mysqlUtils.userHavePrivileges(base, userId, config.mysqlConnPool, function (err, flag) {
+            if (!err && flag) {
+              editRecords();
+            } else {
+              res.sendStatus(403);
+            }
+          });
         }
 
-        function editRecords(flag) {
-          if (flag) {
-            const context = {
-              username: req.session.identity.login,
-            }
-            res.render('index', {
-              development: config.isDevelopment,
-              rebaseUrl: config.rebaseUrl,
-              context,
-              options,
-            });
-          } else {
-            res.sendStatus(403);
+        function editRecords() {
+          const context = {
+            username: req.session.identity.login,
           }
+          res.render('index', {
+            development: config.isDevelopment,
+            rebaseUrl: config.rebaseUrl,
+            context,
+            options,
+          });
         }
       } else {
         res.sendStatus(401);
@@ -194,7 +193,7 @@ function addBackendRoutes(app, config, store) {
             const baseUrl = `https://${s3Bucket}.s3.amazonaws.com/${uploadPath}`;
             const player_url = `${config.playerUrl}?base=${encodeURIComponent(baseUrl)}`;
             if (!config.enableOauth && config.database)
-              mysqlUtils.storeRecord(req.session.userId, targetName, baseUrl, id, config.database);
+              mysqlUtils.storeRecord(req.session.context.userId, targetName, baseUrl, id, config.mysqlConnPool);
             res.json({ player_url, events, audio });
           });
         });
@@ -202,46 +201,44 @@ function addBackendRoutes(app, config, store) {
     });
   });
 
-  app.post('/delete', checkLogin, function (req, res) {
+  app.post('/record/delete', checkLogin, function (req, res) {
 
-    let recordId = req.body.recordId;
+    const recordId = req.body.recordId;
     if (req.session.context.isAdmin) {
       deleteRecord(true);
     } else {
-      mysqlUtils.userHavePrivileges(
-        recordId,
-        req.session.userId,
-        config.database,
-        deleteRecord
-      );
+      mysqlUtils.userHavePrivileges(recordId, req.session.context.userId, config.database, function (err, isAllowed) {
+        if (!err && isAllowed) {
+          deleteRecord();
+        } else {
+          console.error("user is not allowed to delete the record");
+          res.redirect(req.get('Referrer'));
+        }
+      });
     }
 
-    function deleteRecord(flag) {
-      if (flag) {
-        config.getUserConfig(req, function (err, userConfig) {
-          selectTarget(userConfig, userConfig['grants'][0], function (err, target) {
-            if (err) return res.json({ error: err.toString() });
-            const { s3Bucket, uploadPath: uploadDir } = target;
-            const s3Client = upload.makeS3Client(target);
-            const keys = [
-              { Key: `${uploadDir}/${recordId}.mp3` },
-              { Key: `${uploadDir}/${recordId}.json` },
-            ]
-            upload.deleteObjects(s3Client, s3Bucket, keys).then(function (data) {
-              if (!config.enableOauth && config.database) 
-                mysqlUtils.deleteRecord(recordId, config.database);
-              console.log("record deleted successfully", data);
-              res.redirect(req.get('Referrer'));
-            }).catch(function (err) {
-              console.error("error while deleting record", err);
-              res.redirect(req.get('Referrer'));
-            });
+    function deleteRecord() {
+      config.getUserConfig(req, function (err, userConfig) {
+        selectTarget(userConfig, userConfig['grants'][0], function (err, target) {
+          if (err) return res.json({ error: err.toString() });
+          const { s3Bucket, uploadPath: uploadDir } = target;
+          const s3Client = upload.makeS3Client(target);
+          const keys = [
+            { Key: `${uploadDir}/${recordId}.mp3` },
+            { Key: `${uploadDir}/${recordId}.json` },
+          ]
+          upload.deleteObject(s3Client, s3Bucket, keys).then(function (data) {
+            if (!config.enableOauth && config.database) {
+              mysqlUtils.deleteRecord(recordId, config.mysqlConnPool);
+            }
+            console.log("record deleted successfully", data);
+            res.redirect(req.get('Referrer'));
+          }).catch(function (err) {
+            console.error("error while deleting record", err);
+            res.redirect(req.get('Referrer'));
           });
         });
-      } else {
-        console.error("user is not allowed to delete the record");
-        res.redirect(req.get('Referrer'));
-      }
+      });
     }
   });
 
@@ -341,6 +338,9 @@ fs.readFile('config.json', 'utf8', function (err, data) {
   const config = JSON.parse(data);
   config.isDevelopment = process.env.NODE_ENV !== 'production';
   config.rootDir = path.resolve(path.dirname(__dirname));
+  if (config.database) {
+    config.mysqlConnPool = mysql.createPool(config.database);
+  }
   console.log(`running in ${config.isDevelopment ? 'development' : 'production'} mode`);
   if (!config.playerUrl) {
     config.playerUrl = `${config.baseUrl}/player`;

@@ -39,7 +39,7 @@ block content
                                     - var iframeButtonClass=['btn', 'btn-success'];
                                     button(class=iframeButtonClass data=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(event)") Copy
                                 td
-                                    form(class="form-signin" method="POST" action="/delete")
+                                    form(class="form-signin" method="POST" action="/record/delete")
                                         input(type="hidden" name="recordId" value=`${val.id}`)
                                         - var deleteButtonClass=['btn', 'btn-danger'];
                                         button(class=deleteButtonClass type="submit") Delete

@@ -4,4 +4,5 @@ function copyAsIframe(e) {
     let iframe = `<p><iframe src="${data}" width="100%" height="1000" marginwidth="0" marginheight="0" frameborder="0">` +
                  `</iframe></p>`
     navigator.clipboard.writeText(iframe);
+    setTimeout(function(){alert(`IFrame link is copied to your clipboard: ${iframe}`)},100);
 }
