@@ -22,18 +22,18 @@ module.exports = function (app, config, callback) {
         }
     });
 
-    app.get('/signup', checkAdmin, function (req, res) {
-        res.render('signup.pug', { context: req.session.context });
+    app.get('/user/add', checkAdmin, function (req, res) {
+        res.render('create_user.pug', { context: req.session.context });
     });
 
     app.get('/dashboard', checkLogin, function (req, res) {
         if (req.session.context.isAdmin) {
             res.redirect('/admin');
         } else {
-            mysqlUtils.getRecords(req.session.userId, null, config.database, function (err, records) {
+            mysqlUtils.getRecords(req.session.context.userId, null, config.mysqlConnPool, function (err, records) {
                 let context = req.session.context;
+                if (!err) context['records'] = records;
                 context['user'] = req.session.user;
-                context['records'] = records;
                 res.render('dashboard', {
                     baseUrl: config.baseUrl,
                     context,
@@ -43,11 +43,11 @@ module.exports = function (app, config, callback) {
     });
 
     app.get('/admin', checkLogin, checkAdmin, function (req, res) {
-        const userId = req.session.userId;
+        const userId = req.session.context.userId;
         const isAdmin = req.session.context.isAdmin;
         const username = req.session.context.username;
-        mysqlUtils.getAllUsers(config.database, function (err, users) {
-            mysqlUtils.getRecords(userId, isAdmin, config.database, function (err, records) {
+        mysqlUtils.getAllUsers(config.mysqlConnPool, function (err, users) {
+            mysqlUtils.getRecords(userId, isAdmin, config.mysqlConnPool, function (err, records) {
                 res.render('admin.pug', {
                     baseUrl: config.baseUrl,
                     context: {
@@ -62,19 +62,14 @@ module.exports = function (app, config, callback) {
         });
     });
 
-    app.post('/signup', checkLogin, checkAdmin, function (req, res) {
+    app.post('/user/add', checkLogin, checkAdmin, function (req, res) {
         const email = req.body.email;
         const pass = md5(req.body.password);
-        const sql = `INSERT INTO users(email_id, password) VALUES ('${email}', '${pass}')`;
-        const db = mysql.createConnection(config.database);
-        db.query(sql, function (err, results) {
-            db.end();
-            if (!err) {
+        mysqlUtils.createUser(email, pass, config.mysqlConnPool, function (err, isSuccessful) {
+            if (!err && isSuccessful) {
                 res.redirect('/dashboard');
-            }
-            else {
-                let message = 'DB Error While Creating Account';
-                res.render('login.pug', { message: message });
+            } else {
+                res.render('login.pug', { message: 'Unable to Create User' });
             }
         });
     });
@@ -82,38 +77,31 @@ module.exports = function (app, config, callback) {
     app.post('/login', function (req, res) {
         const email = req.body.email;
         const pass = md5(req.body.password);
-        const sql = `SELECT id, email_id, is_active, is_admin, bucket_id FROM users WHERE email_id='${email}' and password='${pass}'`;
-        const db = mysql.createConnection(config.database);
-        db.query(sql, function (err, results) {
-            if (err) {
-                let message = 'Error Connecting to DB';
-                res.render('login.pug', { message: message });
+        mysqlUtils.loginUser(email, pass, config.mysqlConnPool, function (err, userData) {
+            if (!err && userData) {
+                req.session.bucketId = userData[0].bucket_id;
+
+                req.session.context = {
+                    userId: userData[0].id,
+                    bucketId: userData[0].bucket_id,
+                    username: userData[0].email_id,
+                    isActive: userData[0].is_active,
+                    isAdmin: userData[0].is_admin,
+                }
+
+                req.session.identity = {
+                    id: userData[0].id,
+                    login: userData[0].email_id,
+                };
+
+                return userLogin(req, res);
             } else {
-                if (results.length) {
-                    req.session.userId = results[0].id;
-                    req.session.bucketId = results[0].bucket_id;
-
-                    req.session.context = {
-                        username: results[0].email_id,
-                        isActive: results[0].is_active,
-                        isAdmin: results[0].is_admin
-                    }
-
-                    req.session.identity = {
-                        id: results[0].id,
-                        login: results[0].email_id,
-                    };
-
-                    db.end();
-                    return userLogin(req, res);
-                }
-                else {
-                    res.render('login.pug', { message: 'Wrong Credentials' });
-                }
+                res.render('login.pug', { message: 'Wrong Credentials' });
             }
         });
+
         function userLogin(req, res) {
-            getUserConfig(req.session.bucketId, function (err, userConfig) {
+            mysqlUtils.getUserConfig(req.session.context.bucketId, config.mysqlConnPool, function (err, userConfig) {
                 if (err) return res.render('login.pug', { message: err.toString() });
                 req.session.grants = userConfig.grants;
                 req.session.user = JSON.stringify(getFrontendUser(req.session))
@@ -128,7 +116,6 @@ module.exports = function (app, config, callback) {
         });
     });
 
-    /* Return the 'user' object passed to the frontend. */
     function getFrontendUser(session) {
         if (!session.identity) return false;
         const { id, login } = session.identity;
@@ -147,39 +134,8 @@ module.exports = function (app, config, callback) {
     }
 
     config.getUserConfig = function (req, callback) {
-        getUserConfig(req.session.bucketId, callback);
+        mysqlUtils.getUserConfig(req.session.context.bucketId, config.mysqlConnPool, callback);
     };
 
-    /* Retrieve the local configuration for the given user_id. */
-    function getUserConfig(bucketId, callback) {
-        const db = mysql.createConnection(config.database);
-        const grants = [];
-        db.connect(function (err) {
-            if (err) return done(err);
-            return queryLegacyUserConfig();
-        });
-
-        function queryLegacyUserConfig() {
-            const q = "SELECT value FROM buckets WHERE bucket_id = ? LIMIT 1";
-            db.query(q, [bucketId], function (err, rows) {
-                if (err) return done('database error');
-                if (rows.length === 1) {
-                    try {
-                        const grant = JSON.parse(rows[0].value);
-                        grant.type = "s3"
-                        grants.push(grant);
-                    } catch (ex) {
-                        return done('parse error');
-                    }
-                }
-                done();
-            });
-        }
-        function done(err) {
-            db.end();
-            if (err) return callback(err);
-            callback(null, { grants });
-        }
-    };
     callback(null);
 };
