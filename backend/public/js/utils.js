@@ -51,3 +51,28 @@ function validateToggleUserActivation(form) {
         }
     });
 }
+
+
+function validateRecordDeletion(form) {
+    let recordName = form.recordId.getAttribute('data-record-name');
+    if (confirm(`Do you really want to delete the record (${recordName})?`)) {
+        let recordId = form.recordId.value;
+        $.ajax({
+            url: '/record/delete',
+            type: 'POST',
+            contentType: 'application/x-www-form-urlencoded',
+            data: {recordId},
+            success:(response) => {
+                let recordRow = $(`#record-row-${recordId}`);
+                if (recordRow.siblings().length == 1) {
+                    recordRow.html("<td colspan='6'>No Records Found</td>");
+                } else {
+                    recordRow.remove();
+                }
+            },
+            error: (err) => {
+                alert(err.responseText);
+            }
+        });
+    }
+}

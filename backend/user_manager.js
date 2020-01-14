@@ -127,7 +127,6 @@ module.exports = function (app, config, callback) {
                     isActive: userData[0].is_active,
                     isAdmin: userData[0].is_admin,
                 }
-
                 req.session.identity = {
                     id: userData[0].id,
                     login: userData[0].email_id,
