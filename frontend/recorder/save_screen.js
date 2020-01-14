@@ -164,8 +164,8 @@ class SaveScreen extends React.PureComponent {
             <input id='playerUrlInput' type='text' className='bp3-input bp3-fill' value={playerUrl} readOnly />
           </FormGroup>}
           {playerUrl &&
-          <FormGroup labelFor='playerUrlIFrame' label={getMessage('IFRAME_LINK')}>
-            <input id='playerUrlIFrame' type='text' className='bp3-input bp3-fill' value={this.generateIframeLink(playerUrl)} readOnly />
+          <FormGroup labelFor='playerUrlIframe' label={getMessage('IFRAME_LINK')}>
+            <input id='playerUrlIframe' type='text' className='bp3-input bp3-fill' value={this.generateIframeLink(playerUrl)} readOnly />
           </FormGroup>}
       </form>
     );

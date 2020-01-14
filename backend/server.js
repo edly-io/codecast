@@ -145,7 +145,7 @@ function addBackendRoutes(app, config, store) {
         base = base.split('/').pop();
 
         if (req.session.context.isAdmin) {
-          editRecords(true);
+          editRecords();
         } else {
           const userId = req.session.context.userId;
           mysqlUtils.userHavePrivileges(base, userId, config.mysqlConnPool, function (err, flag) {
@@ -205,7 +205,7 @@ function addBackendRoutes(app, config, store) {
 
     const recordId = req.body.recordId;
     if (req.session.context.isAdmin) {
-      deleteRecord(true);
+      deleteRecord();
     } else {
       mysqlUtils.userHavePrivileges(recordId, req.session.context.userId, config.database, function (err, isAllowed) {
         if (!err && isAllowed) {

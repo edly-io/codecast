@@ -22,7 +22,7 @@ module.exports = {
   UPLOADING_ERROR: "An error occurred while uploading.",
   UPLOADING_COMPLETE: "Recording complete!",
   PLAYBACK_LINK: "Playback link",
-  IFRAME_LINK: "IFrame Link",
+  IFRAME_LINK: "Iframe Link",
   IOPANE_MODE: "Input/output mechanism:",
   IOPANE_MODE_SPLIT: "Split input/output",
   IOPANE_MODE_INTERACTIVE: "Interactive terminal",

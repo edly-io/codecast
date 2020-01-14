@@ -1,10 +1,10 @@
 
-const mysql = require('mysql');
+const md5 = require('md5');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
-const md5 = require('md5');
-import mysqlUtils from './mysql_utils';
-import { checkLogin, checkAdmin } from './middlewares';
+
+const mysqlUtils = require('./mysql_utils');
+const { checkLogin, checkAdmin } = require('./middlewares');
 
 
 module.exports = function (app, config, callback) {
