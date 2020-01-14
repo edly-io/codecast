@@ -145,19 +145,19 @@ function addBackendRoutes(app, config, store) {
         base = base.split('/').pop();
 
         if (req.session.context.isAdmin) {
-          editRecords();
+          showEditor();
         } else {
           const userId = req.session.context.userId;
           mysqlUtils.userHavePrivileges(base, userId, config.mysqlConnPool, function (err, flag) {
             if (!err && flag) {
-              editRecords();
+              showEditor();
             } else {
               res.sendStatus(403);
             }
           });
         }
 
-        function editRecords() {
+        function showEditor() {
           const context = {
             username: req.session.identity.login,
           }
