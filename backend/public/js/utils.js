@@ -1,10 +1,16 @@
-function copyAsIframe(e) {
-    e.preventDefault();
-    const data = e.target.getAttribute('data');
-    let iframe = `<p><iframe src="${data}" width="100%" height="1000" marginwidth="0" marginheight="0" frameborder="0">` +
-                 `</iframe></p>`
+function copyAsIframe(button) {
+    const data = button.getAttribute('data-url');
+    const iframe = `<p><iframe src="${data}" width="100%" height="1000" marginwidth="0" marginheight="0" frameborder="0">` +
+        `</iframe></p>`
     navigator.clipboard.writeText(iframe);
-    setTimeout(function(){alert(`IFrame link is copied to your clipboard: ${iframe}`)},100);
+    button.innerHTML = 'Copied';
+    button.classList.toggle('btn-primary');
+    button.classList.toggle('btn-success');
+    setTimeout(function () {
+        button.innerHTML = 'Copy';
+        button.classList.toggle('btn-primary');
+        button.classList.toggle('btn-success');
+    }, 2000);
 }
 
 
