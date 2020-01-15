@@ -1,6 +1,10 @@
 exports.checkLogin = function (req, res, next) {
     if (req.session.context && req.session.context.isActive) {
         next();
+    }else if (req.session.context && !req.session.context.isActive){
+        res.render('login.pug', { 
+            message: 'Kindly, contact admin to active your account'
+        });
     } else {
         res.redirect('/login');
     }
@@ -11,7 +15,7 @@ exports.checkAdmin = function (req, res, next) {
         next();
     } else {
         res.render('login.pug', { 
-            message: 'Login with Admin Account to Access Admin Panel'
+            message: 'Kindly, login with admin account to access admin panel'
         });
     }
 }

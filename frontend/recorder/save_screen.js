@@ -84,7 +84,7 @@ class SaveScreen extends React.PureComponent {
   render () {
     const {getMessage, grants} = this.props;
     const {audioUrl, wavAudioUrl, eventsUrl, playerUrl, step, error, progress} = this.props;
-    const {targetUrl} = this.state;
+    const {targetUrl, targetName} = this.state;
     const grantOptions = grants.map(({url, description}) => ({value: url, label: description}));
     let message = null, canUpload = false, busy = false;
     switch (step) {
@@ -131,7 +131,7 @@ class SaveScreen extends React.PureComponent {
     /* TODO: select target among user grants */
     return (
       <form>
-        <FormGroup labelFor='eventsUrlInput' label={"URL évènements"}>
+        {/* <FormGroup labelFor='eventsUrlInput' label={"URL évènements"}>
           <input id='eventsUrlInput' type='text' className='bp3-input bp3-fill' value={eventsUrl||''} readOnly/>
         </FormGroup>
         <FormGroup labelFor='audioUrlInput' label={"URL audio"}>
@@ -140,14 +140,14 @@ class SaveScreen extends React.PureComponent {
         {wavAudioUrl &&
           <FormGroup labelFor='wavAudioUrlInput' label={"URL audio (wav)"}>
             <input id='wavAudioUrlInput' type='text' className='bp3-input bp3-fill' value={wavAudioUrl||''} readOnly/>
-          </FormGroup>}
+          </FormGroup>} */}
         <FormGroup label="Target">
           <HTMLSelect options={grantOptions} value={targetUrl} onChange={this.handleTargetChange} />
         </FormGroup>
         <FormGroup labelFor='recordNameInput' label={"Recording Name"}>
-          <input id='recordNameInput' type='text' maxLength='30' placeholder="recording name here" className='bp3-input' onChange={this.handleNameChange} required/>
+          <input id='recordNameInput' disabled={step === 'done'} type='text' maxLength='30' placeholder="Recording Name" className='bp3-input' onChange={this.handleNameChange} required />
         </FormGroup>
-        <Button onClick={this.onUpload} disabled={!canUpload} intent={canUpload ? Intent.PRIMARY : Intent.NONE}
+        <Button onClick={this.onUpload} disabled={!(canUpload && targetName)} intent={canUpload ? Intent.PRIMARY : Intent.NONE}
           icon='floppy-disk' text="Save" />
         <div>
           {busy
@@ -161,20 +161,35 @@ class SaveScreen extends React.PureComponent {
           <ProgressBar value={progress} />}
         {playerUrl &&
           <FormGroup labelFor='playerUrlInput' label={getMessage('PLAYBACK_LINK')}>
-            <input id='playerUrlInput' type='text' className='bp3-input bp3-fill' value={playerUrl} readOnly />
+            <input id='playerUrlInput' data-small-text='playerUrlInputSmallText' type='text' onClick={this.copyToClipboard} onFocus={this.handleFocus} className='bp3-input bp3-fill' value={playerUrl} readOnly />
+            <small id='playerUrlInputSmallText'>(Click on link to copy)</small>
           </FormGroup>}
           {playerUrl &&
           <FormGroup labelFor='playerUrlIframe' label={getMessage('IFRAME_LINK')}>
-            <input id='playerUrlIframe' type='text' className='bp3-input bp3-fill' value={this.generateIframeLink(playerUrl)} readOnly />
+            <input id='playerUrlIframe' data-small-text='playerUrlIframeSmallText' type='text' onClick={this.copyToClipboard} onFocus={this.handleFocus} className='bp3-input bp3-fill' value={this.generateIframeLink(playerUrl)} readOnly />
+            <small id='playerUrlIframeSmallText'>(Click on link to copy)</small>
           </FormGroup>}
       </form>
     );
   }
 
-  generateIframeLink(playerlink){
-    return `<p><iframe src="${playerlink}" width="100%" height="1000" marginwidth="0" marginheight="0" frameborder="0">
-            </iframe>
-            </p>`;
+  copyToClipboard = (event) => {
+    event.target.select();
+    let smallTextId = event.target.getAttribute('data-small-text');
+    let smallText = document.getElementById(smallTextId);
+    document.execCommand('copy');
+    smallText.innerHTML = '<b>(Copied)<b>';
+    setTimeout(function(){
+      smallText.innerHTML =  '(Click on link to copy)';
+    }, 2000)
+  };
+
+   handleFocus(event) {
+    event.target.select();
+  }
+
+   generateIframeLink(playerlink) {
+    return `<p><iframe src="${playerlink}" width="100%" height="1000" marginwidth="0" marginheight="0" frameborder="0"></iframe></p>`;
   }
 
   static getDerivedStateFromProps (props, state) {

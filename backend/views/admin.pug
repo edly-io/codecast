@@ -63,7 +63,7 @@ block content
                                 a(href=`/editor?base=${encodeURIComponent(val.link)}` target="editor") EDITOR
                             td
                                 - var iframeButtonClasses=['btn', 'btn-success'];
-                                button(class=iframeButtonClasses data=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(event)") Copy
+                                button(class=iframeButtonClasses data-url=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(this)") Copy
                             td
                                 form(class="form-signin" onsubmit="validateRecordDeletion(this); return false;" action="#")
                                     input(type="hidden" name="recordId" value=`${val.id}` data-record-name=`${val.name}`)
