@@ -84,9 +84,9 @@ module.exports = function (app, config, callback) {
 
         mysqlUtils.deleteUser(userId, config.mysqlConnPool, function (err, isDeletionSuccessful) {
             if (!err && isDeletionSuccessful) {
-                res.status(200).send('User has been successfully deleted.');
+                return res.status(200).send('User has been successfully deleted.');
             } else {
-                res.status(500).send('Failed to delete the requested user because of db related error.');
+                return res.status(500).send('Failed to delete the requested user because of db related error.');
             }
         });
     });
@@ -100,9 +100,9 @@ module.exports = function (app, config, callback) {
 
         mysqlUtils.toggleUserActivation(userId, config.mysqlConnPool, function (err, isActivationToggledSuccessful) {
             if (!err && isActivationToggledSuccessful) {
-                res.status(200).send('User activation has been successfully toggled.');
+                return res.status(200).send('User activation has been successfully toggled.');
             } else {
-                res.status(500).send('Failed to toggle the requested user activation because of db related error.')
+                return res.status(500).send('Failed to toggle the requested user activation because of db related error.')
             }
         });
     });

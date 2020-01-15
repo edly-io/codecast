@@ -35,8 +35,8 @@ block content
                                         li
                                             form(onsubmit="validateUserDeletion(this); return false" action="#")
                                                 input(type="hidden" name="userId" value=`${val.id}`, data-email=`${val.emailId}`)
-                                                - var deleteButtonClass=['btn', 'btn-danger'];
-                                                button(class=deleteButtonClass type="submit") Delete
+                                                - var deleteButtonClasses=['btn', 'btn-danger'];
+                                                button(class=deleteButtonClasses type="submit") Delete
 
             a(href="/user/add" class="btn btn-success") Add Users
 
@@ -62,13 +62,13 @@ block content
                                 |  | <!-- To add double spaces. -->
                                 a(href=`/editor?base=${encodeURIComponent(val.link)}` target="editor") EDITOR
                             td
-                                - var iframeButtonClass=['btn', 'btn-success'];
-                                button(class=iframeButtonClass data=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(event)") Copy
+                                - var iframeButtonClasses=['btn', 'btn-success'];
+                                button(class=iframeButtonClasses data=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(event)") Copy
                             td
                                 form(class="form-signin" onsubmit="validateRecordDeletion(this); return false;" action="#")
                                     input(type="hidden" name="recordId" value=`${val.id}` data-record-name=`${val.name}`)
-                                    - var buttonClass=['btn', 'btn-danger'];
-                                    button(class=buttonClass type="submit") Delete
+                                    - var deleteButtonClasses=['btn', 'btn-danger'];
+                                    button(class=deleteButtonClasses type="submit") Delete
                 else
                     tr
                         td(colspan="6") No Records Found
