@@ -9,10 +9,10 @@ block content
             div(class="form-signin")
                 div.text-center
                     if !context.isActive
-                        p 
+                        p
                             | Your Account is not active, kindly
                             | contact admin to get it activated
-        
+
         if context && context.isActive
             div.text-center(style='margin:30px')
                 h3 My Recordings
@@ -28,12 +28,12 @@ block content
                         - function capitalize(s) {return s.charAt(0).toUpperCase() + s.slice(1);};
                         each val, index in context.records
                             tr
-                                td #{capitalize(val.creator)}
+                                td #{val.creator}
                                 td #{val.name}
                                 td #{val.publishDate}
                                 td
                                     a(href=`/player?base=${encodeURIComponent(val.link)}` target="player") PLAYER
-                                    |  | 
+                                    |  |
                                     a(href=`/editor?base=${encodeURIComponent(val.link)}` target="editor") EDITOR
                                 td
                                     - var iframeButtonClass=['btn', 'btn-success'];
@@ -46,7 +46,5 @@ block content
                     else
                         tr
                             td(colspan="6") No Records Found
-                
-                a(href="/recorder" class="btn btn-success") Add Record
 
-        
+                a(href="/recorder" class="btn btn-success") Add Record

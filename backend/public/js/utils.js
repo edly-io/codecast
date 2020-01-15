@@ -44,7 +44,7 @@ function validateToggleUserActivation(form) {
         data: {userId},
         success: (response) => {
             let activationToggleButton = form.querySelector('button[type="submit"]');
-            activationToggleButton.classList.toggle('btn-primary');
+            activationToggleButton.classList.toggle('btn-custom-primary');
             if (activationToggleButton.innerHTML.trim() == 'Activate') {
                 activationToggleButton.innerHTML = 'Deactivate';
             } else {
