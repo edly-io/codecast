@@ -74,6 +74,39 @@ module.exports = function (app, config, callback) {
         });
     });
 
+    app.post('/user/delete', checkLogin, checkAdmin, function (req, res) {
+        let userId = parseInt(req.body.userId);
+        // Only admin can delete the other user and nobody can delete admin
+        let currentLoggedInUser = req.session.userId;
+        if (userId === currentLoggedInUser) {
+            return res.status(406).send("Admin can't delete himself.");
+        }
+
+        mysqlUtils.deleteUser(userId, config.mysqlConnPool, function (err, isDeletionSuccessful) {
+            if (!err && isDeletionSuccessful) {
+                res.status(200).send('User has been successfully deleted.');
+            } else {
+                res.status(500).send('Failed to delete the requested user because of db related error.');
+            }
+        });
+    });
+
+    app.post('/user/toggle/activation', checkLogin, checkAdmin, function (req, res) {
+        let userId = parseInt(req.body.userId);
+        let currentLoggedInUser = req.session.userId;
+        if (userId === currentLoggedInUser) {
+            return res.status(406).send("Admin can't toggle its own activation.");
+        }
+
+        mysqlUtils.toggleUserActivation(userId, config.mysqlConnPool, function (err, isActivationToggledSuccessful) {
+            if (!err && isActivationToggledSuccessful) {
+                res.status(200).send('User activation has been successfully toggled.');
+            } else {
+                res.status(500).send('Failed to toggle the requested user activation because of db related error.')
+            }
+        });
+    });
+
     app.post('/login', function (req, res) {
         const email = req.body.email;
         const pass = md5(req.body.password);
@@ -88,7 +121,6 @@ module.exports = function (app, config, callback) {
                     isActive: userData[0].is_active,
                     isAdmin: userData[0].is_admin,
                 }
-
                 req.session.identity = {
                     id: userData[0].id,
                     login: userData[0].email_id,
