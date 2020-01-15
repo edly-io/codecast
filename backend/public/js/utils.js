@@ -9,7 +9,7 @@ function copyAsIframe(e) {
 
 
 function validateUserDeletion(form) {
-    userEmail = form.userId.getAttribute('data-email');
+    let userEmail = form.userId.getAttribute('data-email');
     if (confirm(`Do you really want to delete the user (${userEmail})?`)) {
         let userId = form.userId.value;
         $.ajax({

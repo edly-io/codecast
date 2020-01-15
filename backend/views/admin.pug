@@ -26,9 +26,7 @@ block content
                             td #{capitalize((!!val.isActive).toString())}
                             td #{capitalize((!!val.isAdmin).toString())}
                             td
-                                if val.isAdmin
-                                    p N/A
-                                else
+                                if !val.isAdmin
                                     ul(class='user-actions')
                                         li
                                             form(onsubmit="validateToggleUserActivation(this); return false" action="#")

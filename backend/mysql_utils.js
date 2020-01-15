@@ -208,8 +208,8 @@ exports.deleteUser = function (userId, mysqlConnPool, callback) {
 }
 
 
-exports.toggleUserActivation = function (userActivationBeingToggled, mysqlConnPool, callback) {
-    const sql = `UPDATE users SET is_active = 1 - is_active  WHERE id=${userActivationBeingToggled}`;
+exports.toggleUserActivation = function (userId, mysqlConnPool, callback) {
+    const sql = `UPDATE users SET is_active = 1 - is_active  WHERE id=${userId}`;
     mysqlConnPool.getConnection(function (err, conn) {
         if (!err) {
             conn.query(sql, function (err, result) {
