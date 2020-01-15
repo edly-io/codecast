@@ -206,12 +206,11 @@ function addBackendRoutes(app, config, store) {
     if (req.session.context.isAdmin) {
       deleteRecord();
     } else {
-      mysqlUtils.userHavePrivileges(recordId, req.session.context.userId, config.database, function (err, isAllowed) {
+      mysqlUtils.userHavePrivileges(recordId, req.session.context.userId, config.mysqlConnPool, function (err, isAllowed) {
         if (!err && isAllowed) {
           deleteRecord();
         } else {
-          console.error("user is not allowed to delete the record");
-          res.redirect(req.get('Referrer'));
+          return res.status(406).send('user is not allowed to delete the record');
         }
       });
     }
@@ -219,7 +218,10 @@ function addBackendRoutes(app, config, store) {
     function deleteRecord() {
       config.getUserConfig(req, function (err, userConfig) {
         selectTarget(userConfig, userConfig['grants'][0], function (err, target) {
-          if (err) return res.json({ error: err.toString() });
+          if (err) {
+            console.error(`error getting user configurations: ${err.toString()}`);
+            return res.status(500).send('user is not configured properly.');
+          }
           const { s3Bucket, uploadPath: uploadDir } = target;
           const s3Client = upload.makeS3Client(target);
           const keys = [
@@ -231,10 +233,10 @@ function addBackendRoutes(app, config, store) {
               mysqlUtils.deleteRecord(recordId, config.mysqlConnPool);
             }
             console.log("record deleted successfully", data);
-            res.status(200).send('Record deleted successfully.');
+            return res.status(200).send('Record deleted successfully.');
           }).catch(function (err) {
             console.error("error while deleting record", err);
-            res.status(500).send('Record deletion failed because of db related error.');
+            return res.status(500).send('Record deletion failed because of db related error.');
           });
         });
       });
