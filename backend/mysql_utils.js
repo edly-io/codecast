@@ -4,8 +4,8 @@ function dbError(err, callback) {
     return callback(err, null);
 }
 
-exports.createUser = function (email, pass, mysqlConnPool, callback) {
-    const sql = `INSERT INTO users(email_id, password) VALUES ('${email}', '${pass}')`;
+exports.createUser = function (email, username, pass, mysqlConnPool, callback) {
+    const sql = `INSERT INTO users(email_id, username, password) VALUES ('${email}', '${username}', '${pass}')`;
     mysqlConnPool.getConnection(function (err, conn) {
         if (!err) {
             conn.query(sql, function (err, result) {
@@ -21,6 +21,27 @@ exports.createUser = function (email, pass, mysqlConnPool, callback) {
         }
     });
 }
+
+
+exports.doesUserExist = function (email, mysqlConnPool, callback) {
+    const sql = `SELECT 1 from users where email_id='${email}'`;
+    mysqlConnPool.getConnection(function (err, conn) {
+        if (!err) {
+            conn.query(sql, function (err, result) {
+                conn.release();
+                if (!err) {
+                    // returning result.length as a boolean value
+                    return callback(null, result.length);
+                } else {
+                    return dbError(err, callback);
+                }
+            });
+        } else {
+            return dbError(err, callback);
+        }
+    });
+}
+
 
 exports.loginUser = function (email, pass, mysqlConnPool, callback) {
     const sql = `SELECT * FROM users WHERE email_id=? and password=?`;
