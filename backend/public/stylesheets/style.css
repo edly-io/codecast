@@ -25,7 +25,7 @@ input[type="text"] {
   margin-top: 10px;
 }
 
-button[type="submit"] {
+form.form-signin button[type="submit"] {
   margin: auto;
   width: auto;
   margin-top: 5px;
@@ -36,18 +36,47 @@ table {
   align-content: center;
 }
 
-.btn-custom-primary {
+.btn-custom-action {
 	background-color: #167f92;
-	color: white;
+  color: white;
+  border: 1px solid;
+  border-radius: 50%;
+  width: 40px;
+  padding-bottom: 5px;
   }
 
-  .btn-custom-primary:hover {
+  .btn-custom-action:hover {
 	color: white;
 	background-color: #0d6a7a;
   }
 
-  .btn-custom-primary:focus {
-	color: white;
+  .btn-custom-action:focus {
+  color: white;
+  outline: none;
+  }
+
+  .btn-deactivate {
+    background-color: #999c9ace;
+    color: white;
+    border: 1px solid;
+    border-radius: 50%;
+    width: 40px;
+    padding-bottom: 5px;
+    }
+
+  .btn-deactivate:hover {
+    color: white;
+    background-color: #656866ce;
+    }
+
+    .btn-deactivate:focus {
+    color: white;
+    outline: none;
+    }
+
+    span.glyphicon {
+      font-size: 18px;
+      vertical-align: middle;
   }
 
 .btn-success{
@@ -89,16 +118,8 @@ th{
   text-align: center;
 }
 
-ul.user-actions {
-  display: inline-block;
-  margin-bottom: -10px;
-  margin-left: -50px;
-}
-
-ul.user-actions li {
-  margin: 5px;
-  float: left;
-  list-style: none;
+.btn-group form {
+  display: inline;
 }
 
 #recordNameInput{
