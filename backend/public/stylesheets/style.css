@@ -105,6 +105,24 @@ ul.user-actions li {
   width: 300px;
 }
 
+.dashboard {
+  margin-top: 100px;
+}
+.dashboard img {
+  border-radius: 100px;
+  padding: 40px;
+  margin: 40px 0px;
+  height: auto;
+  max-width: 100%;
+  background-color: #d3ddd8;
+}
+.dashboard img:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  transform: scale(1.1);
+}
+.dashboard a {
+  color: #024457;
+}
 .responstable {
 	margin: 0 1em 0 0;
 	width: 100%;

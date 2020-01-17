@@ -6,71 +6,16 @@ block content
         if context.user
                 script.
                     window.localStorage.setItem('user', '!{context.user}');
-        div.text-center
-            h2 Admin Panel
-
-        div.text-center(style='margin-top:30px')
-            h3 All Users
-            table(class='responstable table-hover table-bordered' style='width:100%; line-height:2.5')
-                tr
-                    th ID
-                    th Email
-                    th Active
-                    th Admin
-                    th Actions
-                if context && context.users
-                    each val, index in context.users
-                        tr(id=`user-row-${val.id}`)
-                            td #{val.id}
-                            td #{val.emailId}
-                            td #{capitalize((!!val.isActive).toString())}
-                            td #{capitalize((!!val.isAdmin).toString())}
-                            td
-                                if !val.isAdmin
-                                    ul(class='user-actions')
-                                        li
-                                            form(onsubmit="validateToggleUserActivation(this); return false" action="#")
-                                                input(type="hidden" name="userId" value=`${val.id}`)
-                                                button(class=(val.isActive) ? "btn" : "btn btn-custom-primary" type="submit" style="width:100px") #{val.isActive ? "Deactivate" : "Activate"}
-                                        li
-                                            form(onsubmit="validateUserDeletion(this); return false" action="#")
-                                                input(type="hidden" name="userId" value=`${val.id}`, data-email=`${val.emailId}`)
-                                                - var deleteButtonClasses=['btn', 'btn-danger'];
-                                                button(class=deleteButtonClasses type="submit") Delete
-
-            a(href="/user/add" class="btn btn-success") Add Users
-
-        div.text-center(style='margin-top:30px')
-            h3 All Recordings
-
-            table(class='responstable table-hover table-bordered' style='width:100%; line-height:2.5')
-                tr
-                    th Publisher
-                    th Name
-                    th Creation Date
-                    th Records
-                    th IFrame Link
-                    th Actions
-                if context && context.records
-                    each val, index in context.records
-                        tr(id=`record-row-${val.id}`)
-                            td #{val.creator}
-                            td #{val.name}
-                            td #{val.publishDate}
-                            td
-                                a(href=`/player?base=${encodeURIComponent(val.link)}` target="player") PLAYER
-                                |  | <!-- To add double spaces. -->
-                                a(href=`/editor?base=${encodeURIComponent(val.link)}` target="editor") EDITOR
-                            td
-                                - var iframeButtonClasses=['btn', 'btn-success'];
-                                button(class=iframeButtonClasses data-url=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(this)") Copy
-                            td
-                                form(class="form-signin" onsubmit="validateRecordDeletion(this); return false;" action="#")
-                                    input(type="hidden" name="recordId" value=`${val.id}` data-record-name=`${val.name}`)
-                                    - var deleteButtonClasses=['btn', 'btn-danger'];
-                                    button(class=deleteButtonClasses type="submit") Delete
-                else
-                    tr
-                        td(colspan="6") No Records Found
-
-            a(href="/recorder" class="btn btn-success") Add Record
+        div(class="row dashboard")
+            div(class="col-md-3")
+            div(class="col-md-3")
+                a(href="/admin")
+                    div.text-center
+                        h1 All Users
+                    img(src="../../assets/persons.png")
+            div(class="col-md-3")
+                a(href="/admin")
+                    div.text-center
+                        h1 All Recordings
+                    img(src="../../assets/recorder.png")
+            div(class="col-md-3")
