@@ -51,8 +51,10 @@ exports.loginUser = function (email, pass, mysqlConnPool, callback) {
                 conn.release();
                 if (!err && result.length === 1) {
                     return callback(null, result);
-                } else {
+                } else if (err) {
                     return dbError(err, callback);
+                } else {
+                    return callback(null, null);
                 }
             });
         } else {
@@ -178,7 +180,7 @@ exports.getRecords = function (userId, isAdmin, mysqlConnPool, callback) {
 }
 
 exports.getAllUsers = function (mysqlConnPool, callback) {
-    const sql = "SELECT id, email_id, is_active, is_admin FROM users";
+    const sql = "SELECT id, username, email_id, is_active, is_admin FROM users";
     mysqlConnPool.getConnection(function (err, conn) {
         if (!err) {
             conn.query(sql, function (err, results) {
@@ -189,6 +191,7 @@ exports.getAllUsers = function (mysqlConnPool, callback) {
                         results.forEach(function (item, index) {
                             users[item.id] = {
                                 id: item.id,
+                                username: item.username,
                                 emailId: item.email_id,
                                 isActive: item.is_active,
                                 isAdmin: item.is_admin

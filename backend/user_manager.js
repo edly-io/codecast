@@ -62,6 +62,31 @@ module.exports = function (app, config, callback) {
         });
     });
 
+    app.get('/admin/records', checkLogin, checkAdmin, function (req, res) {
+        const context = req.session.context;
+        mysqlUtils.getRecords(context.userId, context.isAdmin, config.mysqlConnPool, function (err, records) {
+            context['records'] = records;
+            context['user'] = req.session.user;
+            res.render('records_list.pug', {
+                baseUrl: config.baseUrl,
+                context: context,
+            });
+        });
+    });
+
+    app.get('/admin/users', checkLogin, checkAdmin, function (req, res) {
+        const context = req.session.context;
+        mysqlUtils.getAllUsers(config.mysqlConnPool, function (err, users) {
+            context['users'] = users;
+            context['user'] = req.session.user;
+            res.render('users_list.pug', {
+                baseUrl: config.baseUrl,
+                context: context,
+            });
+        });
+    });
+
+
     app.post('/user/add', checkLogin, checkAdmin, function (req, res) {
         const email = req.body.email;
         const username = req.body.username.trim();
@@ -144,13 +169,13 @@ module.exports = function (app, config, callback) {
                 req.session.context = {
                     userId: userData[0].id,
                     bucketId: userData[0].bucket_id,
-                    username: userData[0].email_id,
+                    username: userData[0].username,
                     isActive: userData[0].is_active,
                     isAdmin: userData[0].is_admin,
                 }
                 req.session.identity = {
                     id: userData[0].id,
-                    login: userData[0].email_id,
+                    login: userData[0].username,
                 };
 
                 return userLogin(req, res);

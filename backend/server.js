@@ -124,17 +124,15 @@ function addBackendRoutes(app, config, store) {
   app.get('/recorder', checkLogin, function (req, res) {
     buildOptions(config, req, 'recorder', function (err, options) {
       if (err) return res.send(`Error: ${err.toString()}`);
-      let context = {
-        username: req.session.identity.login,
-      }
       res.render('index', {
         development: config.isDevelopment,
         rebaseUrl: config.rebaseUrl,
-        context,
+        context : req.session.context,
         options,
       });
     });
   });
+
 
   app.get('/editor', checkLogin, function (req, res) {
     buildOptions(config, req, 'editor', function (err, options) {
@@ -158,13 +156,10 @@ function addBackendRoutes(app, config, store) {
         }
 
         function showEditor() {
-          const context = {
-            username: req.session.identity.login,
-          }
           res.render('index', {
             development: config.isDevelopment,
             rebaseUrl: config.rebaseUrl,
-            context,
+            context: req.session.context,
             options,
           });
         }
