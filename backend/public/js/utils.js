@@ -96,3 +96,23 @@ function validateRecordDeletion(form) {
         });
     }
 }
+
+
+function validateUserCreation(form) {
+    $.ajax({
+        url: '/user/add',
+        type: 'POST',
+        contentType: 'application/x-www-form-urlencoded',
+        data: {
+            email: form.email.value,
+            username: form.username.value,
+            password: form.password.value
+        },
+        success:(response) => {
+            alert(response);
+        },
+        error: (err) => {
+            alert(err.responseText);
+        }
+    });
+}
