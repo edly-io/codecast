@@ -7,36 +7,35 @@ block content
                 script.
                     window.localStorage.setItem('user', '!{context.user}');
         if context
-            div.text-center(style='margin-top:30px')
-                h3 All Recordings
-                table(class='responstable table-hover table-bordered' style='width:100%; line-height:2.5')
+            table(class='responstable table-hover table-bordered' style='width:100%; line-height:2.5')
                     tr
                         th Publisher
                         th Name
                         th Creation Date
-                        th Records
-                        th IFrame Link
                         th Actions
-                    if context.records
+                    if context && context.records
                         each val, index in context.records
                             tr(id=`record-row-${val.id}`)
                                 td #{val.creator}
                                 td #{val.name}
                                 td #{val.publishDate}
                                 td
-                                    a(href=`/player?base=${encodeURIComponent(val.link)}` target="player") PLAYER
-                                    |  | <!-- To add double spaces. -->
-                                    a(href=`/editor?base=${encodeURIComponent(val.link)}` target="editor") EDITOR
-                                td
-                                    - var iframeButtonClasses=['btn', 'btn-success'];
-                                    button(class=iframeButtonClasses data-url=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(this)") Copy
-                                td
-                                    form(class="form-signin" onsubmit="validateRecordDeletion(this); return false;" action="#")
-                                        input(type="hidden" name="recordId" value=`${val.id}` data-record-name=`${val.name}`)
-                                        - var deleteButtonClasses=['btn', 'btn-danger'];
-                                        button(class=deleteButtonClasses type="submit") Delete
+                                    div(class="btn-group" role="group")
+                                        button(class="btn-custom-action" data-url=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(this)" title="Copy Iframe Link")
+                                            span(class="glyphicon glyphicon-copy")
+                                        a(href=`/player?base=${encodeURIComponent(val.link)}` target="player")
+                                            button(class="btn-custom-action" title="Player")
+                                                span(class="glyphicon glyphicon-play")
+                                        a(href=`/editor?base=${encodeURIComponent(val.link)}` target="editor")
+                                            button(class="btn-custom-action" title="Editor")
+                                                span(class="glyphicon glyphicon-music")
+                                        form(onsubmit="validateRecordDeletion(this); return false;" action="#")
+                                            input(type="hidden" name="recordId" value=`${val.id}` data-record-name=`${val.name}`)
+
+                                            button(class="btn-custom-action" type="submit" title="Delete Record")
+                                                span(class="glyphicon glyphicon-trash")
                     else
                         tr
                             td(colspan="6") No Records Found
 
-                a(href="/recorder" class="btn btn-success") Add Record
+            a(href="/recorder" class="btn btn-success") Add Record

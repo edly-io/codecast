@@ -6,7 +6,6 @@ block content
         if context.user
                 script.
                     window.localStorage.setItem('user', '!{context.user}');
-
         if context
             div.text-center(style='margin-top:30px')
                 h3 All Users
@@ -18,27 +17,37 @@ block content
                         th Active
                         th Admin
                         th Actions
-                    if context.users
+                    if context && context.users
                         each val, index in context.users
                             tr(id=`user-row-${val.id}`)
                                 td #{val.id}
                                 td #{capitalize(val.username)}
                                 td #{val.emailId}
-                                td #{capitalize((!!val.isActive).toString())}
-                                td #{capitalize((!!val.isAdmin).toString())}
+                                td
+                                    if val.isActive
+                                        span(class="glyphicon glyphicon-ok")
+                                    else
+                                        span(class="glyphicon glyphicon-remove")
+                                td
+                                    if val.isAdmin
+                                        span(class="glyphicon glyphicon-ok")
+                                    else
+                                        span(class="glyphicon glyphicon-remove")
+
                                 td
                                     if !val.isAdmin
-                                        ul(class='user-actions')
-                                            li
-                                                form(onsubmit="validateToggleUserActivation(this); return false" action="#")
-                                                    input(type="hidden" name="userId" value=`${val.id}`)
-                                                    button(class=(val.isActive) ? "btn" : "btn btn-custom-primary" type="submit" style="width:100px") #{val.isActive ? "Deactivate" : "Activate"}
-                                            li
-                                                form(onsubmit="validateUserDeletion(this); return false" action="#")
-                                                    input(type="hidden" name="userId" value=`${val.id}`, data-email=`${val.emailId}`)
-                                                    - var deleteButtonClasses=['btn', 'btn-danger'];
-                                                    button(class=deleteButtonClasses type="submit") Delete
-                    else
-                        tr
-                            td(colspan="6") No Records Found
+
+                                        div(class="btn-group" role="group")
+                                            form(onsubmit="validateToggleUserActivation(this); return false" action="#")
+                                                input(type="hidden" name="userId" value=`${val.id}`)
+                                                button(class=(val.isActive) ? "btn-deactivate" : "btn-custom-action" title=(val.isActive) ? "Deactivate" : "Activate" type="submit")
+                                                    if val.isActive
+                                                        span(class="glyphicon glyphicon-remove")
+                                                    else
+                                                        span(class="glyphicon glyphicon-ok")
+                                            form(onsubmit="validateUserDeletion(this); return false" action="#")
+                                                input(type="hidden" name="userId" value=`${val.id}`, data-email=`${val.emailId}`)
+                                                button(class="btn-custom-action" type="submit" title="Delete User")
+                                                    span(class="glyphicon glyphicon-trash")
+
                 a(href="/user/add" class="btn btn-success") Add Users
