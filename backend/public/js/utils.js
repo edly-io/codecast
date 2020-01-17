@@ -3,14 +3,12 @@ function copyAsIframe(button) {
     const iframe = `<p><iframe src="${data}" width="100%" height="1000" marginwidth="0" marginheight="0" frameborder="0">` +
         `</iframe></p>`
     navigator.clipboard.writeText(iframe);
-    button.innerHTML = 'Copied';
-    button.classList.toggle('btn-primary');
-    button.classList.toggle('btn-success');
+    button.classList.toggle('btn-custom-action');
+    button.classList.toggle('btn-deactivate');
     setTimeout(function () {
-        button.innerHTML = 'Copy';
-        button.classList.toggle('btn-primary');
-        button.classList.toggle('btn-success');
-    }, 2000);
+        button.classList.toggle('btn-custom-action');
+        button.classList.toggle('btn-deactivate');
+    }, 1000);
 }
 
 
@@ -49,15 +47,19 @@ function validateToggleUserActivation(form) {
         contentType: 'application/x-www-form-urlencoded',
         data: {userId},
         success: (response) => {
-            let activationToggleButton = form.querySelector('button[type="submit"]');
-            activationToggleButton.classList.toggle('btn-custom-primary');
-            if (activationToggleButton.innerHTML.trim() == 'Activate') {
-                activationToggleButton.innerHTML = 'Deactivate';
+            let activationToggleButton = form.children[1];
+            if (activationToggleButton.getAttribute('title') == 'Deactivate') {
+                activationToggleButton.setAttribute('title', 'Activate');
             } else {
-                activationToggleButton.innerHTML = 'Activate';
+                activationToggleButton.setAttribute('title', 'Deactivate');
             }
-            let activeStatusColumn = document.getElementById(`user-row-${userId}`).cells[2];
-            activeStatusColumn.innerHTML = (activeStatusColumn.innerHTML == 'True') ? 'False' : 'True';
+            activationToggleButton.classList.toggle('btn-custom-action');
+            activationToggleButton.classList.toggle('btn-deactivate');
+            form.children[1].children[0].classList.toggle('glyphicon-ok');
+            form.children[1].children[0].classList.toggle('glyphicon-remove');
+            let activeStatusColumn = document.getElementById(`user-row-${userId}`).cells[3];
+            activeStatusColumn.children[0].classList.toggle('glyphicon-remove');
+            activeStatusColumn.children[0].classList.toggle('glyphicon-ok');
         },
         error: (err) => {
             alert(err.responseText);
@@ -78,7 +80,7 @@ function validateRecordDeletion(form) {
             success:(response) => {
                 let recordRow = $(`#record-row-${recordId}`);
                 if (recordRow.siblings().length == 1) {
-                    recordRow.html("<td colspan='6'>No Records Found</td>");
+                    recordRow.html("<td colspan='4'>No Records Found</td>");
                 } else {
                     recordRow
                         .children('td, th')
