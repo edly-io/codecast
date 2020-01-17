@@ -2,13 +2,13 @@ extends layout
 
 block content
     div(style='width: 60%; margin: 0 auto;')
+        - function capitalize(s) {return s.charAt(0).toUpperCase() + s.slice(1);};
         if context.user
                 script.
                     window.localStorage.setItem('user', '!{context.user}');
-
         if context
-            div.text-center(style='margin:30px')
-                h3 My Recordings
+            div.text-center(style='margin-top:30px')
+                h3 All Recordings
                 table(class='responstable table-hover table-bordered' style='width:100%; line-height:2.5')
                     tr
                         th Publisher
@@ -18,7 +18,6 @@ block content
                         th IFrame Link
                         th Actions
                     if context.records
-                        - function capitalize(s) {return s.charAt(0).toUpperCase() + s.slice(1);};
                         each val, index in context.records
                             tr(id=`record-row-${val.id}`)
                                 td #{val.creator}
@@ -30,7 +29,7 @@ block content
                                     a(href=`/editor?base=${encodeURIComponent(val.link)}` target="editor") EDITOR
                                 td
                                     - var iframeButtonClasses=['btn', 'btn-success'];
-                                    button(class=iframeButtonClasses data=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(event)") Copy
+                                    button(class=iframeButtonClasses data-url=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(this)") Copy
                                 td
                                     form(class="form-signin" onsubmit="validateRecordDeletion(this); return false;" action="#")
                                         input(type="hidden" name="recordId" value=`${val.id}` data-record-name=`${val.name}`)

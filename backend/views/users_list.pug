@@ -1,0 +1,44 @@
+extends layout
+
+block content
+    div(style='width: 60%; margin: 0 auto;')
+        - function capitalize(s) {return s.charAt(0).toUpperCase() + s.slice(1);};
+        if context.user
+                script.
+                    window.localStorage.setItem('user', '!{context.user}');
+
+        if context
+            div.text-center(style='margin-top:30px')
+                h3 All Users
+                table(class='responstable table-hover table-bordered' style='width:100%; line-height:2.5')
+                    tr
+                        th ID
+                        th Name
+                        th Email
+                        th Active
+                        th Admin
+                        th Actions
+                    if context.users
+                        each val, index in context.users
+                            tr(id=`user-row-${val.id}`)
+                                td #{val.id}
+                                td #{capitalize(val.username)}
+                                td #{val.emailId}
+                                td #{capitalize((!!val.isActive).toString())}
+                                td #{capitalize((!!val.isAdmin).toString())}
+                                td
+                                    if !val.isAdmin
+                                        ul(class='user-actions')
+                                            li
+                                                form(onsubmit="validateToggleUserActivation(this); return false" action="#")
+                                                    input(type="hidden" name="userId" value=`${val.id}`)
+                                                    button(class=(val.isActive) ? "btn" : "btn btn-custom-primary" type="submit" style="width:100px") #{val.isActive ? "Deactivate" : "Activate"}
+                                            li
+                                                form(onsubmit="validateUserDeletion(this); return false" action="#")
+                                                    input(type="hidden" name="userId" value=`${val.id}`, data-email=`${val.emailId}`)
+                                                    - var deleteButtonClasses=['btn', 'btn-danger'];
+                                                    button(class=deleteButtonClasses type="submit") Delete
+                    else
+                        tr
+                            td(colspan="6") No Records Found
+                a(href="/user/add" class="btn btn-success") Add Users
