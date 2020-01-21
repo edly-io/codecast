@@ -102,7 +102,7 @@ exports.storeRecord = function (userId, recordName, baseUrl, recordId, mysqlConn
             conn.query(sql, function (err, result) {
                 conn.release();
                 if (err) {
-                    console.error("error storing record link")
+                    console.error(`error storing record link: ${err}`)
                 }
             });
         }
