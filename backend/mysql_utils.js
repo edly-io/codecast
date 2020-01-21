@@ -4,8 +4,8 @@ function dbError(err, callback) {
     return callback(err, null);
 }
 
-exports.createUser = function (email, pass, mysqlConnPool, callback) {
-    const sql = `INSERT INTO users(email_id, password) VALUES ('${email}', '${pass}')`;
+exports.createUser = function (email, username, pass, mysqlConnPool, callback) {
+    const sql = `INSERT INTO users(email_id, username, password) VALUES ('${email}', '${username}', '${pass}')`;
     mysqlConnPool.getConnection(function (err, conn) {
         if (!err) {
             conn.query(sql, function (err, result) {
@@ -22,6 +22,27 @@ exports.createUser = function (email, pass, mysqlConnPool, callback) {
     });
 }
 
+
+exports.doesUserExist = function (email, mysqlConnPool, callback) {
+    const sql = `SELECT 1 from users where email_id='${email}'`;
+    mysqlConnPool.getConnection(function (err, conn) {
+        if (!err) {
+            conn.query(sql, function (err, result) {
+                conn.release();
+                if (!err) {
+                    // returning result.length as a boolean value
+                    return callback(null, result.length);
+                } else {
+                    return dbError(err, callback);
+                }
+            });
+        } else {
+            return dbError(err, callback);
+        }
+    });
+}
+
+
 exports.loginUser = function (email, pass, mysqlConnPool, callback) {
     const sql = `SELECT * FROM users WHERE email_id=? and password=?`;
     mysqlConnPool.getConnection(function (err, conn) {
@@ -30,8 +51,10 @@ exports.loginUser = function (email, pass, mysqlConnPool, callback) {
                 conn.release();
                 if (!err && result.length === 1) {
                     return callback(null, result);
-                } else {
+                } else if (err) {
                     return dbError(err, callback);
+                } else {
+                    return callback(null, null);
                 }
             });
         } else {
@@ -79,7 +102,7 @@ exports.storeRecord = function (userId, recordName, baseUrl, recordId, mysqlConn
             conn.query(sql, function (err, result) {
                 conn.release();
                 if (err) {
-                    console.error("error storing record link")
+                    console.error(`error storing record link: ${err}`)
                 }
             });
         }
@@ -157,7 +180,7 @@ exports.getRecords = function (userId, isAdmin, mysqlConnPool, callback) {
 }
 
 exports.getAllUsers = function (mysqlConnPool, callback) {
-    const sql = "SELECT id, email_id, is_active, is_admin FROM users";
+    const sql = "SELECT id, username, email_id, is_active, is_admin FROM users";
     mysqlConnPool.getConnection(function (err, conn) {
         if (!err) {
             conn.query(sql, function (err, results) {
@@ -168,6 +191,7 @@ exports.getAllUsers = function (mysqlConnPool, callback) {
                         results.forEach(function (item, index) {
                             users[item.id] = {
                                 id: item.id,
+                                username: item.username,
                                 emailId: item.email_id,
                                 isActive: item.is_active,
                                 isAdmin: item.is_admin

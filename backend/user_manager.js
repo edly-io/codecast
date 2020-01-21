@@ -62,16 +62,68 @@ module.exports = function (app, config, callback) {
         });
     });
 
+    app.get('/admin/records', checkLogin, checkAdmin, function (req, res) {
+        const context = req.session.context;
+        mysqlUtils.getRecords(context.userId, context.isAdmin, config.mysqlConnPool, function (err, records) {
+            context['records'] = records;
+            context['user'] = req.session.user;
+            res.render('records_list.pug', {
+                baseUrl: config.baseUrl,
+                context: context,
+            });
+        });
+    });
+
+    app.get('/admin/users', checkLogin, checkAdmin, function (req, res) {
+        const context = req.session.context;
+        mysqlUtils.getAllUsers(config.mysqlConnPool, function (err, users) {
+            context['users'] = users;
+            context['user'] = req.session.user;
+            res.render('users_list.pug', {
+                baseUrl: config.baseUrl,
+                context: context,
+            });
+        });
+    });
+
+
     app.post('/user/add', checkLogin, checkAdmin, function (req, res) {
         const email = req.body.email;
-        const pass = md5(req.body.password);
-        mysqlUtils.createUser(email, pass, config.mysqlConnPool, function (err, isSuccessful) {
-            if (!err && isSuccessful) {
-                res.redirect('/dashboard');
-            } else {
-                res.render('login.pug', { message: 'Unable to Create User' });
-            }
-        });
+        const username = req.body.username.trim();
+        const unHashedPass = req.body.password;
+        const pass = md5(unHashedPass);
+
+        const validationErrors = []
+
+        const usernameValidation = validateUsername(username);
+        if (usernameValidation) {
+            validationErrors.push(usernameValidation)
+        }
+        if (!validateEmail(email)) {
+            validationErrors.push('Invalid email address.');
+        }
+        if (unHashedPass.length == 0) {
+            validationErrors.push('You must set some password.');
+        }
+        if (validationErrors.length > 0) {
+            return res.status(406).send(validationErrors);
+        } else {
+            mysqlUtils.doesUserExist(email, config.mysqlConnPool, function (err, isUserPresent) {
+                if (!err && isUserPresent) {
+                    return res.status(200).send(`User with this email (${email}) already exists.`);
+                } else if (!err && !isUserPresent) {
+                    mysqlUtils.createUser(email, username, pass, config.mysqlConnPool, function (err, isSuccessful) {
+                        if (!err && isSuccessful) {
+                            return res.status(200).send('User has been created successfully.');
+                        } else {
+                            return res.status(500).send('Db related error occurred while creating the user.');
+                        }
+                    });
+                } else {
+                    return res.status(500).send(err);
+                }
+            });
+        }
     });
 
     app.post('/user/delete', checkLogin, checkAdmin, function (req, res) {
@@ -117,13 +169,13 @@ module.exports = function (app, config, callback) {
                 req.session.context = {
                     userId: userData[0].id,
                     bucketId: userData[0].bucket_id,
-                    username: userData[0].email_id,
+                    username: userData[0].username,
                     isActive: userData[0].is_active,
                     isAdmin: userData[0].is_admin,
                 }
                 req.session.identity = {
                     id: userData[0].id,
-                    login: userData[0].email_id,
+                    login: userData[0].username,
                 };
 
                 return userLogin(req, res);
@@ -163,6 +215,21 @@ module.exports = function (app, config, callback) {
             }
         }
         return { id, login, grants };
+    }
+
+    function validateEmail(emailAddress) {
+        var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        return emailPattern.test(emailAddress);
+    }
+
+    function validateUsername(username) {
+        if (username.length > 30) {
+            return 'Username length exceeds 30 characters.';
+        } else if (username.length == 0) {
+            return 'Invalid username.';
+        } else {
+            return null;
+        }
     }
 
     config.getUserConfig = function (req, callback) {

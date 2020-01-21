@@ -5,17 +5,17 @@ block content
         div.text-center
             h3(class='btn-danger') #{message}
 
-    div.text-center
-        form(class="form-signin" method="POST" action="/login")
+    div.row
+        div.col-md-4
+        div.thumbnail.col-md-4.user-form-layout.text-center
+            form(method="POST" action="/login")
 
-            - var h1Classes = ['h3', 'mb-3', 'font-weight-normal']
-            h1(class=h1Classes) Sign In
+                h1 Sign In
 
-            label( for="inputEmail" class="sr-only mb-3") Email address
-            input(type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus)
+                input(type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus)
 
-            label(for="inputPassword" class="sr-only mb-3") Password
-            input(type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required)
+                input(type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required)
 
-            - var buttonClasses=['btn', 'btn-lg', 'btn-primary', 'btn-block', 'mb-3'];
-            button(class=buttonClasses type="submit") Login
+                - var buttonClasses=['btn', 'btn-lg', 'btn-primary', 'btn-block', 'mb-3'];
+                button(class=buttonClasses type="submit") Login
+        div.col-md-4

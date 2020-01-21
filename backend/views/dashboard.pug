@@ -5,15 +5,8 @@ block content
         if context.user
                 script.
                     window.localStorage.setItem('user', '!{context.user}');
-        div.text-center
-            div(class="form-signin")
-                div.text-center
-                    if !context.isActive
-                        p
-                            | Your Account is not active, kindly
-                            | contact admin to get it activated
 
-        if context && context.isActive
+        if context
             div.text-center(style='margin:30px')
                 h3 My Recordings
                 table(class='responstable table-hover table-bordered' style='width:100%; line-height:2.5')
@@ -21,8 +14,6 @@ block content
                         th Publisher
                         th Name
                         th Creation Date
-                        th Records
-                        th IFrame Link
                         th Actions
                     if context.records
                         - function capitalize(s) {return s.charAt(0).toUpperCase() + s.slice(1);};
@@ -32,19 +23,22 @@ block content
                                 td #{val.name}
                                 td #{val.publishDate}
                                 td
-                                    a(href=`/player?base=${encodeURIComponent(val.link)}` target="player") PLAYER
-                                    |  |
-                                    a(href=`/editor?base=${encodeURIComponent(val.link)}` target="editor") EDITOR
-                                td
-                                    - var iframeButtonClasses=['btn', 'btn-success'];
-                                    button(class=iframeButtonClasses data=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(event)") Copy
-                                td
-                                    form(class="form-signin" onsubmit="validateRecordDeletion(this); return false;" action="#")
-                                        input(type="hidden" name="recordId" value=`${val.id}` data-record-name=`${val.name}`)
-                                        - var deleteButtonClasses=['btn', 'btn-danger'];
-                                        button(class=deleteButtonClasses type="submit") Delete
+                                    div(class="btn-group" role="group")
+                                        button(class="btn-custom-action" data-url=`${baseUrl}/player?base=${encodeURIComponent(val.link)}` onClick="copyAsIframe(this)" title="Copy Iframe Link")
+                                            span(class="glyphicon glyphicon-copy")
+                                        a(href=`/player?base=${encodeURIComponent(val.link)}` target="player")
+                                            button(class="btn-custom-action" title="Player")
+                                                span(class="glyphicon glyphicon-play")
+                                        a(href=`/editor?base=${encodeURIComponent(val.link)}` target="editor")
+                                            button(class="btn-custom-action" title="Editor")
+                                                span(class="glyphicon glyphicon-edit")
+                                        form(onsubmit="validateRecordDeletion(this); return false;" action="#")
+                                            input(type="hidden" name="recordId" value=`${val.id}` data-record-name=`${val.name}`)
+
+                                            button(class="btn-custom-action" type="submit" title="Delete Record")
+                                                span(class="glyphicon glyphicon-trash")
                     else
                         tr
-                            td(colspan="6") No Records Found
+                            td(colspan="4") No Records Found
 
                 a(href="/recorder" class="btn btn-success") Add Record
