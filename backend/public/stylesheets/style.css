@@ -9,10 +9,6 @@ body {
 	background: #f2f2f2;
 }
 
-.form-signin .form-control:focus {
-  z-index: 2;
-}
-
 input[type="password"],
 input[type="email"],
 input[type="text"] {
@@ -22,13 +18,6 @@ input[type="text"] {
   margin: auto;
   width: auto;
   margin-top: 10px;
-}
-
-form.form-signin button[type="submit"] {
-  margin: auto;
-  width: auto;
-  margin-top: 5px;
-  margin-bottom: 5px;
 }
 
 .user-form-layout {
