@@ -127,7 +127,7 @@ function addBackendRoutes(app, config, store) {
       res.render('index', {
         development: config.isDevelopment,
         rebaseUrl: config.rebaseUrl,
-        context : req.session.context,
+        context: req.session.context,
         options,
       });
     });
@@ -199,11 +199,11 @@ function addBackendRoutes(app, config, store) {
   app.post('/record/delete', checkLogin, function (req, res) {
     const recordId = req.body.recordId;
     if (req.session.context.isAdmin) {
-      deleteRecord();
+      return deleteRecord();
     } else {
       mysqlUtils.userHavePrivileges(recordId, req.session.context.userId, config.mysqlConnPool, function (err, isAllowed) {
         if (!err && isAllowed) {
-          deleteRecord();
+          return deleteRecord();
         } else {
           return res.status(406).send('user is not allowed to delete the record');
         }
@@ -212,28 +212,38 @@ function addBackendRoutes(app, config, store) {
 
     function deleteRecord() {
       config.getUserConfig(req, function (err, userConfig) {
-        selectTarget(userConfig, userConfig['grants'][0], function (err, target) {
-          if (err) {
-            console.error(`error getting user configurations: ${err.toString()}`);
-            return res.status(500).send('user is not configured properly.');
-          }
-          const { s3Bucket, uploadPath: uploadDir } = target;
-          const s3Client = upload.makeS3Client(target);
-          const keys = [
-            { Key: `${uploadDir}/${recordId}.mp3` },
-            { Key: `${uploadDir}/${recordId}.json` },
-          ]
-          upload.deleteObject(s3Client, s3Bucket, keys).then(function (data) {
-            if (!config.enableOauth && config.database) {
-              mysqlUtils.deleteRecord(recordId, config.mysqlConnPool);
+        if (err) {
+          return res.status(500).send('record deletion failed');
+        } else {
+          selectTarget(userConfig, userConfig['grants'][0], function (err, target) {
+            if (err) {
+              console.error(`error getting user configurations: ${err.toString()}`);
+              return res.status(500).send('user is not configured properly.');
             }
-            console.log("record deleted successfully", data);
-            return res.status(200).send('Record deleted successfully.');
-          }).catch(function (err) {
-            console.error("error while deleting record", err);
-            return res.status(500).send('Record deletion failed because of db related error.');
+            const { s3Bucket, uploadPath: uploadDir } = target;
+            const s3Client = upload.makeS3Client(target);
+            const keys = [
+              { Key: `${uploadDir}/${recordId}.mp3` },
+              { Key: `${uploadDir}/${recordId}.json` },
+            ]
+            upload.deleteObject(s3Client, s3Bucket, keys).then(function (data) {
+              if (!config.enableOauth && config.database) {
+                mysqlUtils.deleteRecord(recordId, config.mysqlConnPool, function (err, result) {
+                  if (err) {
+                    console.error("error while deleting record", err);
+                    return res.status(500).send('Record deletion failed because of db related error.');
+                  } else {
+                    console.log("record deleted successfully");
+                    return res.status(200).send('Record deleted successfully.');
+                  }
+                });
+              }
+            }).catch(function (err) {
+              console.error("error while deleting record", err);
+              return res.status(500).send('Record deletion failed because of db related error.');
+            });
           });
-        });
+        }
       });
     }
   });

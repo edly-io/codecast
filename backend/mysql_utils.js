@@ -30,7 +30,6 @@ exports.doesUserExist = function (email, mysqlConnPool, callback) {
             conn.query(sql, function (err, result) {
                 conn.release();
                 if (!err) {
-                    // returning result.length as a boolean value
                     return callback(null, result.length);
                 } else {
                     return dbError(err, callback);
@@ -71,7 +70,7 @@ exports.getUserConfig = function (bucketId, mysqlConnPool, callback) {
                 conn.release();
                 if (err) {
                     console.error(`error getting user configurations: ${err.toString()}`);
-                    return dbError(err, callback);
+                    return callback(err, null);
                 } else {
                     const grants = [];
                     if (result.length === 1) {
@@ -81,9 +80,8 @@ exports.getUserConfig = function (bucketId, mysqlConnPool, callback) {
                             grants.push(grant);
                         } catch (ex) {
                             console.error(`error parsing user configurations: ${ex.toString()}`);
-                            return dbError(ex, callback);
+                            return callback(err, null);
                         }
-
                     }
                     return callback(null, { grants });
                 }
@@ -102,9 +100,11 @@ exports.storeRecord = function (userId, recordName, baseUrl, recordId, mysqlConn
             conn.query(sql, function (err, result) {
                 conn.release();
                 if (err) {
-                    console.error(`error storing record link: ${err}`)
+                    console.error(`error storing record link: ${err.toString()}`)
                 }
             });
+        } else {
+            console.error(`error storing record link: ${err.toString()}`)
         }
     });
 }
@@ -116,9 +116,14 @@ exports.deleteRecord = function (recordId, mysqlConnPool) {
             conn.query(sql, function (err, result) {
                 conn.release();
                 if (err) {
-                    console.error(`error deleting record link: ${err}`)
+                    console.error(`error deleting record link: ${err.toString()}`)
+                    return callback(err, null);
+                } else {
+                    return callback(err, result);
                 }
             });
+        } else {
+            return dbError(err, callback);
         }
     });
 };
@@ -154,7 +159,7 @@ exports.getRecords = function (userId, isAdmin, mysqlConnPool, callback) {
             conn.query(sql, function (err, results) {
                 conn.release();
                 if (!err) {
-                    let records = {};
+                    const records = {};
                     if (results.length) {
                         results.forEach(function (item, index) {
                             records[item.id] = {
@@ -211,7 +216,6 @@ exports.getAllUsers = function (mysqlConnPool, callback) {
 
 }
 
-
 exports.deleteUser = function (userId, mysqlConnPool, callback) {
     const sql = `DELETE FROM users WHERE id=${userId}`;
     mysqlConnPool.getConnection(function (err, conn) {
@@ -219,8 +223,8 @@ exports.deleteUser = function (userId, mysqlConnPool, callback) {
             conn.query(sql, function (err, result) {
                 conn.release();
                 if (err) {
-                    console.error(`error deleting user: ${err}`)
-                    return dbError(err, callback);
+                    console.error(`error deleting user: ${err.toString()}`)
+                    return callback(err, result);
                 } else {
                     return callback(null, true);
                 }
@@ -231,7 +235,6 @@ exports.deleteUser = function (userId, mysqlConnPool, callback) {
     });
 }
 
-
 exports.toggleUserActivation = function (userId, mysqlConnPool, callback) {
     const sql = `UPDATE users SET is_active = 1 - is_active  WHERE id=${userId}`;
     mysqlConnPool.getConnection(function (err, conn) {
@@ -239,8 +242,8 @@ exports.toggleUserActivation = function (userId, mysqlConnPool, callback) {
             conn.query(sql, function (err, result) {
                 conn.release();
                 if (err) {
-                    console.error(`error toggling user activation: ${err}`)
-                    return dbError(err, callback);
+                    console.error(`error toggling user activation: ${err.toString()}`)
+                    return callback(err, result);
                 } else {
                     return callback(null, true);
                 }
