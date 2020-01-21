@@ -109,7 +109,7 @@ exports.storeRecord = function (userId, recordName, baseUrl, recordId, mysqlConn
     });
 }
 
-exports.deleteRecord = function (recordId, mysqlConnPool) {
+exports.deleteRecord = function (recordId, mysqlConnPool, callback) {
     const sql = `DELETE FROM records WHERE id='${recordId}'`;
     mysqlConnPool.getConnection(function (err, conn) {
         if (!err) {
