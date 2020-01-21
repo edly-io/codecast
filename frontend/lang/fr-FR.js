@@ -15,6 +15,7 @@ module.exports = {
   START_PLAYBACK: "lecture des explications",
   PAUSE_PLAYBACK: "pause des explications",
   START_RECORDING: "démarrer un enregistrement",
+  STOP_RECORDING: "arrête un enregistrement",
   ENCODING_IN_PROGRESS: "Encodage en cours, veuillez patienter.",
   PREPARING_RECORDING: "Préparation de l'enregistrement…",
   UPLOADING_EVENTS: "Envoi des évènements en cours…",
