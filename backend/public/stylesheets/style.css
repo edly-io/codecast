@@ -34,8 +34,8 @@ form.form-signin button[type="submit"] {
 .user-form-layout {
   margin-top:100px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  border-radius: 40px;
-  background-color: #d3ddd8;
+  border-radius: 10px;
+  background-color: #f8f8f8;
 }
 
 .user-form-layout h1 {
@@ -139,6 +139,7 @@ table {
 .navbar{
   min-height: 28px;
   margin-bottom: 30px;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.19), 0 4px 4px 0 rgba(0, 0, 0, 0.19);
 }
 
 th{
