@@ -6,16 +6,16 @@ block content
         if context.user
                 script.
                     window.localStorage.setItem('user', '!{context.user}');
-        div(class="row dashboard")
-            div(class="col-md-3")
-            div(class="col-md-3")
+        div.row.dashboard.text-center
+            div.col-md-2
+            div.col-md-4.thumbnail
                 a(href="/admin/users")
-                    div.text-center
+                    div.caption
                         h1 Users
                     img(src="../../assets/persons.png")
-            div(class="col-md-3")
+            div.col-md-4.thumbnail
                 a(href="/admin/records")
-                    div.text-center
+                    div.caption
                         h1 Records
                     img(src="../../assets/recorder.png")
-            div(class="col-md-3")
+            div.col-md-2

@@ -1,16 +1,14 @@
 extends base
 
 block content
-    if message
-        div.text-center
-            h3(class='btn-danger') #{message}
-
     div.row
         div.col-md-4
         div.thumbnail.col-md-4.user-form-layout.text-center
+            if message
+                div(class="text-center alert alert-danger" role="alert") #{message}
             form(method="POST" action="/login")
 
-                h1 Sign In
+                h1 Codecast
 
                 input(type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus)
 
