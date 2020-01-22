@@ -1,6 +1,5 @@
 /config/server.*
 /node_modules
-/c-to-json
 /build
 config.json
 .vscode/
