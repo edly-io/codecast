@@ -182,13 +182,14 @@ class EditorApp extends React.PureComponent {
     const {collapsed} = this.state;
     return (
       <div id='editor-app'>
-        <div id='floating-controls' className={classnames({collapsed})}>
+        <div>
+          {/* <div id='floating-controls' className={classnames({collapsed})}>
           <span className='collapse-toggle' onClick={this._toggleCollapsed}>
             <Icon icon={`chevron-${collapsed ? 'down' : 'up'}`}/>
-          </span>
+          </span> */}
           <div className='btn-group'>
             {floatingControls.map((Component, i) => <Component key={i} />)}
-            {/load|setup/.test(activity) && <LogoutButton/>}
+            {/* {/load|setup/.test(activity) && <LogoutButton/>} */}
           </div>
         </div>
         <Screen/>

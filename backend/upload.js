@@ -49,10 +49,12 @@ export function putObject (s3, params) {
 };
 
 export function deleteObject (s3, bucket, key) {
+  
+  const obj = Array.isArray(key) ? key:[{Key: key}];
   const params = {
     Bucket: bucket,
     Delete: {
-      Objects: [{Key: key}],
+      Objects: obj,
     },
   };
   return s3.deleteObjects(params).promise();

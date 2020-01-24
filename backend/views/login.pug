@@ -1,0 +1,19 @@
+extends base
+
+block content
+    div.row
+        div.col-md-4
+        div.thumbnail.col-md-4.user-form-layout.text-center
+            if message
+                div(class="text-center alert alert-danger" role="alert") #{message}
+            form(method="POST" action="/login")
+
+                h1 Codecast
+
+                input(type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus)
+
+                input(type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required)
+
+                - var buttonClasses=['btn', 'btn-lg', 'btn-primary', 'btn-block', 'mb-3'];
+                button(class=buttonClasses type="submit") Login
+        div.col-md-4
