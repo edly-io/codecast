@@ -130,6 +130,39 @@ Create `config.json` under the codecast cloned directory:
 ```
 Replace `IP_ADDRESS` with either your IP address or host name matching NGINX server block configuration.
 
+To install its required packages, run:
+```console
+$ npm install
+```
+
+You might see an error similar to this:
+```console
+../deps/mpg123/src/output/alsa.c:19:10: fatal error: alsa/asoundlib.h: No such file or directory #include <alsa/asoundlib.h>
+```
+You can get rid of the above mentioned error by installing the following package:
+```console
+$ sudo apt-get install libasound2-dev
+```
+After that, run `npm install` command again and if you see any error something like that is given below, JUST IGNORE IT and proceed to next step:
+```console
+gyp ERR! build error
+gyp ERR! stack Error: `make` failed with exit code: 2
+gyp ERR! stack     at ChildProcess.onExit (/home/umar/.nvm/versions/node/v12.10.0/lib/node_modules/npm/node_modules/node-gyp/lib/build.js:196:23)
+gyp ERR! stack     at ChildProcess.emit (events.js:209:13)
+gyp ERR! stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:272:12)
+gyp ERR! System Linux 4.15.0-20-generic
+gyp ERR! command "/home/umar/.nvm/versions/node/v12.10.0/bin/node" "/home/umar/.nvm/versions/node/v12.10.0/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js" "rebuild"
+gyp ERR! cwd /home/umar/Documents/Work/codecast/node_modules/speaker
+gyp ERR! node -v v12.10.0
+gyp ERR! node-gyp -v v5.0.3
+gyp ERR! not ok
+```
+
+Compile assets using:
+```console
+$ npm run build
+```
+
 Write a startup script `/home/codecast/codecast.sh` for CodeCast:
 ```bash
 #!/bin/bash
