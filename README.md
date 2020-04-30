@@ -153,19 +153,6 @@ Compile assets using:
 ```console
 $ npm run build
 ```
-
-Write a startup script `/home/codecast/codecast.sh` for CodeCast:
-```bash
-#!/bin/bash
-
-source ~/.bashrc
-export NODE_ENV=production
-npm run start
-```
-Change the script permissions to executable:
-```console
-$ chmod +x /home/codecast/codecast.sh
-```
 ## **Setup Supervisor**
 Install and configure `supervisor` as root:
 ```console
@@ -174,15 +161,16 @@ Install and configure `supervisor` as root:
 Create a supervisor configuration file `/etc/supervisor/conf.d/codecast.conf` for CodeCast:
 ```ini
 [program:codecast]
-
-command=/home/codecast/codecast.sh
-
+environment=PATH=/home/codecast/.npm/bin:/usr/local/bin:/usr/bin:/bin,NODE_ENV=production
+command=node /usr/bin/npx --no-install babel-node backend/server.js
 user=codecast
 directory=/home/codecast/codecast
 stdout_logfile=/var/log/supervisor/%(program_name)s-stdout.log
 stderr_logfile=/var/log/supervisor/%(program_name)s-stderr.log
-killasgroup=true
+priority=10
+autostart=true
 autorestart=true
+stopsignal=QUIT
 ```
 CodeCast runs as a foreground process. Hence the above supervisor configuration file ensures that CodeCast is restarted if it crashes or quits for some reason.
 
